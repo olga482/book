@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тех.карты десертов</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍰 Мои тех.карты</h1>
+            <button id="addBtn" class="btn-primary">+ Добавить рецепт</button>
+        </header>
+
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="🔍 Поиск по названию...">
+            <select id="categoryFilter">
+                <option value="">Все категории</option>
+                <option value="торты">🎂 Торты</option>
+                <option value="пирожные">🧁 Пирожные</option>
+                <option value="десерты">🍮 Десерты</option>
+                <option value="крема">🥛 Крема</option>
+                <option value="муссы">☁️ Муссы</option>
+                <option value="бисквиты">🍰 Бисквиты</option>
+                <option value="начинки">🍓 Начинки</option>
+                <option value="глазури">✨ Глазури</option>
+                <option value="декор">🌸 Декор</option>
+                <option value="другое">📝 Другое</option>
+            </select>
+        </div>
+
+        <div id="recipesList" class="recipes-grid"></div>
+
+        <!-- Модальное окно -->
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 id="modalTitle">Новый рецепт</h2>
+                <form id="recipeForm">
+                    <input type="hidden" id="recipeId">
+                    
+                    <label>Название:</label>
+                    <input type="text" id="recipeName" required>
+
+                    <label>Категория:</label>
+                    <select id="recipeCategory" required>
+                        <option value="торты">🎂 Торты</option>
+                        <option value="пирожные">🧁 Пирожные</option>
+                        <option value="десерты">🍮 Десерты</option>
+                        <option value="крема">🥛 Крема</option>
+                        <option value="муссы">☁️ Муссы</option>
+                        <option value="бисквиты">🍰 Бисквиты</option>
+                        <option value="начинки">🍓 Начинки</option>
+                        <option value="глазури">✨ Глазури</option>
+                        <option value="декор">🌸 Декор</option>
+                        <option value="другое">📝 Другое</option>
+                    </select>
+
+                    <label>Фото (URL или base64):</label>
+                    <input type="text" id="recipeImage" placeholder="https://... или загрузите файл">
+                    <input type="file" id="imageUpload" accept="image/*">
+
+                    <label>Ингредиенты (каждый с новой строки):</label>
+                    <textarea id="recipeIngredients" rows="6" required></textarea>
+
+                    <label>Инструкция:</label>
+                    <textarea id="recipeInstructions" rows="8" required></textarea>
+
+                    <label>Время приготовления (мин):</label>
+                    <input type="number" id="recipeTime">
+
+                    <label>Размер формы (см):</label>
+                    <select id="recipeFormSize">
+                        <option value="">Не указан</option>
+                        <option value="12">12 см (бенто)</option>
+                        <option value="14">14 см (мини)</option>
+                        <option value="16">16 см</option>
+                        <option value="18">18 см</option>
+                        <option value="20">20 см</option>
+                        <option value="22">22 см</option>
+                        <option value="24">24 см</option>
+                        <option value="26">26 см</option>
+                        <option value="28">28 см (макси)</option>
+                        <option value="30">30 см (макси)</option>
+                    </select>
+
+                    <label>Выход (порций/шт):</label>
+                    <input type="text" id="recipeYield">
+
+                    <div class="form-buttons">
+                        <button type="submit" class="btn-primary">Сохранить</button>
+                        <button type="button" id="cancelBtn" class="btn-secondary">Отмена</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Модальное окно просмотра -->
+        <div id="viewModal" class="modal">
+            <div class="modal-content">
+                <span class="close-view">&times;</span>
+                <div id="recipeView"></div>
+                
+                <!-- Калькулятор пересчета -->
+                <div id="calculator" style="display:none; margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 8px;">
+                    <h3>📐 Пересчет на другой размер</h3>
+                    <label>Пересчитать на форму:</label>
+                    <select id="targetFormSize" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 6px; border: 1px solid #ddd;">
+                        <option value="12">12 см (бенто)</option>
+                        <option value="14">14 см (мини)</option>
+                        <option value="16">16 см</option>
+                        <option value="18">18 см</option>
+                        <option value="20">20 см</option>
+                        <option value="22">22 см</option>
+                        <option value="24">24 см</option>
+                        <option value="26">26 см</option>
+                        <option value="28">28 см (макси)</option>
+                        <option value="30">30 см (макси)</option>
+                    </select>
+                    <button onclick="calculateRecipe()" class="btn-primary" style="width: 100%;">Пересчитать</button>
+                    <div id="calculatedResult" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
