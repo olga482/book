@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Технологические карты</title>
     <style>
 * {
@@ -12,10 +12,16 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 15px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     padding: 0;
+}
+
+button, input, select, textarea {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 15px;
 }
 
 .container {
@@ -34,21 +40,24 @@ header {
 
 h1 {
     color: white;
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: 24px;
+    font-weight: 600;
     text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.btn-primary, .btn-secondary, .btn-edit, .btn-delete, .btn-voice, .btn-add-ingredient {
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
 }
 
 .btn-primary {
     background: white;
     color: #667eea;
-    border: none;
-    padding: 12px 28px;
-    border-radius: 50px;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 600;
-    transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
@@ -60,13 +69,13 @@ h1 {
 .btn-secondary {
     background: #e0e0e0;
     color: #333;
-    border: none;
-    padding: 12px 28px;
-    border-radius: 50px;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 600;
-    transition: all 0.3s ease;
+}
+
+.btn-add-ingredient {
+    background: #4CAF50;
+    color: white;
+    padding: 8px 16px;
+    font-size: 14px;
 }
 
 .search-bar {
@@ -86,13 +95,6 @@ h1 {
     backdrop-filter: blur(10px);
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
-}
-
-.search-bar input:focus,
-.search-bar select:focus {
-    outline: none;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-    transform: translateY(-2px);
 }
 
 .recipes-grid {
@@ -149,9 +151,6 @@ h1 {
     color: #999;
     font-size: 13px;
     margin-top: 10px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
 }
 
 .recipe-actions {
@@ -159,16 +158,6 @@ h1 {
     grid-template-columns: 1fr 1fr;
     gap: 10px;
     margin-top: 15px;
-}
-
-.btn-edit, .btn-delete {
-    padding: 10px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: all 0.3s ease;
 }
 
 .btn-edit {
@@ -278,6 +267,28 @@ form textarea {
     margin-top: 30px;
 }
 
+.ingredient-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    align-items: center;
+}
+
+.ingredient-item input {
+    flex: 1;
+    margin: 0;
+}
+
+.ingredient-item button {
+    padding: 8px 12px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
 #recipeView {
     line-height: 1.8;
 }
@@ -347,13 +358,7 @@ form textarea {
 .btn-voice {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    border: none;
     padding: 12px 20px;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: all 0.3s ease;
     white-space: nowrap;
 }
 
@@ -373,10 +378,6 @@ form textarea {
 }
 
 @media (max-width: 768px) {
-    body {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
     .container {
         padding: 15px;
     }
@@ -388,14 +389,13 @@ form textarea {
     }
     
     h1 {
-        font-size: 1.5rem;
+        font-size: 20px;
         text-align: center;
     }
     
     .btn-primary {
         width: 100%;
         padding: 14px;
-        font-size: 16px;
     }
     
     .search-bar {
@@ -410,10 +410,6 @@ form textarea {
     
     .recipe-card img {
         height: 250px;
-    }
-    
-    .recipe-card-content {
-        padding: 18px;
     }
     
     .modal {
@@ -442,11 +438,6 @@ form textarea {
     
     .form-buttons button {
         padding: 14px;
-        font-size: 16px;
-    }
-    
-    #recipeView h2 {
-        font-size: 1.6em;
     }
 }
     </style>
@@ -506,11 +497,13 @@ form textarea {
                     <div id="uploadStatus" style="margin-top: 10px; color: #667eea; font-size: 13px;"></div>
                     <input type="hidden" id="recipeImage">
 
-                    <label>Ингредиенты (каждый с новой строки):</label>
-                    <div class="voice-input-container">
-                        <textarea id="recipeIngredients" rows="6" required></textarea>
-                        <button type="button" id="voiceIngredients" class="btn-voice">Голос</button>
+                    <label>Ингредиенты:</label>
+                    <div id="ingredientsList"></div>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <input type="text" id="newIngredient" placeholder="Название и количество" style="flex: 1;">
+                        <button type="button" id="addIngredientBtn" class="btn-add-ingredient">Добавить</button>
                     </div>
+                    <textarea id="recipeIngredients" style="display: none;"></textarea>
 
                     <label>Инструкция:</label>
                     <div class="voice-input-container">
@@ -524,6 +517,7 @@ form textarea {
                     <label>Размер формы (см):</label>
                     <select id="recipeFormSize">
                         <option value="">Не указан</option>
+                        <option value="10">10 см (бенто)</option>
                         <option value="12">12 см (бенто)</option>
                         <option value="14">14 см (мини)</option>
                         <option value="16">16 см</option>
@@ -535,6 +529,9 @@ form textarea {
                         <option value="28">28 см (макси)</option>
                         <option value="30">30 см (макси)</option>
                     </select>
+
+                    <label>Количество (для пересчета):</label>
+                    <input type="number" id="recipeQuantity" placeholder="Например: 20 шт">
 
                     <label>Выход (порций/шт):</label>
                     <input type="text" id="recipeYield">
@@ -552,22 +549,40 @@ form textarea {
                 <span class="close-view">&times;</span>
                 <div id="recipeView"></div>
                 
-                <div id="calculator" style="display:none; margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 8px;">
-                    <h3>Пересчет на другой размер</h3>
-                    <label>Пересчитать на форму:</label>
-                    <select id="targetFormSize" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 6px; border: 1px solid #ddd;">
-                        <option value="12">12 см (бенто)</option>
-                        <option value="14">14 см (мини)</option>
-                        <option value="16">16 см</option>
-                        <option value="18">18 см</option>
-                        <option value="20">20 см</option>
-                        <option value="22">22 см</option>
-                        <option value="24">24 см</option>
-                        <option value="26">26 см</option>
-                        <option value="28">28 см (макси)</option>
-                        <option value="30">30 см (макси)</option>
-                    </select>
-                    <button onclick="calculateRecipe()" class="btn-primary" style="width: 100%;">Пересчитать</button>
+                <div id="calculator" style="display:none; margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 12px;">
+                    <h3 style="margin-bottom: 15px; font-size: 18px;">Пересчет рецепта</h3>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px;">Тип пересчета:</label>
+                        <select id="recalcType" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 15px;">
+                            <option value="diameter">По диаметру формы</option>
+                            <option value="quantity">По количеству (шт)</option>
+                        </select>
+                    </div>
+                    
+                    <div id="diameterRecalc">
+                        <label style="display: block; margin-bottom: 5px;">Пересчитать на форму:</label>
+                        <select id="targetFormSize" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 15px;">
+                            <option value="10">10 см (бенто)</option>
+                            <option value="12">12 см (бенто)</option>
+                            <option value="14">14 см (мини)</option>
+                            <option value="16">16 см</option>
+                            <option value="18">18 см</option>
+                            <option value="20">20 см</option>
+                            <option value="22">22 см</option>
+                            <option value="24">24 см</option>
+                            <option value="26">26 см</option>
+                            <option value="28">28 см (макси)</option>
+                            <option value="30">30 см (макси)</option>
+                        </select>
+                    </div>
+                    
+                    <div id="quantityRecalc" style="display: none;">
+                        <label style="display: block; margin-bottom: 5px;">Новое количество (шт):</label>
+                        <input type="number" id="targetQuantity" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 15px;" placeholder="Например: 30">
+                    </div>
+                    
+                    <button onclick="calculateRecipe()" class="btn-primary" style="width: 100%; margin-top: 15px;">Пересчитать</button>
                     <div id="calculatedResult" style="margin-top: 15px;"></div>
                 </div>
             </div>
@@ -577,11 +592,19 @@ form textarea {
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
 let recipes = JSON.parse(localStorage.getItem('recipes')) || [];
+let ingredientsList = [];
 
-// Инициализация Telegram Web App
-const tg = window.Telegram.WebApp;
-tg.ready();
-tg.expand();
+// Проверка: работает ли Telegram Web App
+const tg = window.Telegram?.WebApp || {
+    ready: () => {},
+    expand: () => {},
+    CloudStorage: null
+};
+
+if (window.Telegram?.WebApp) {
+    tg.ready();
+    tg.expand();
+}
 
 const modal = document.getElementById('modal');
 const viewModal = document.getElementById('viewModal');
@@ -594,7 +617,37 @@ const recipesList = document.getElementById('recipesList');
 const searchInput = document.getElementById('searchInput');
 const categoryFilter = document.getElementById('categoryFilter');
 const imageUpload = document.getElementById('imageUpload');
+const addIngredientBtn = document.getElementById('addIngredientBtn');
+const newIngredient = document.getElementById('newIngredient');
+const recalcType = document.getElementById('recalcType');
 
+// Таблица коэффициентов пересчета (из твоей картинки)
+const recalcTable = {
+    10: { 10: 1, 12: 1.45, 14: 2, 16: 2.55, 18: 3.25, 20: 4, 22: 4.85, 24: 5.75, 26: 6.75, 28: 7.85, 30: 9 },
+    12: { 10: 0.7, 12: 1, 14: 1.35, 16: 1.8, 18: 2.25, 20: 2.8, 22: 3.35, 24: 4, 26: 4.7, 28: 5.45, 30: 6.25 },
+    14: { 10: 0.5, 12: 0.75, 14: 1, 16: 1.3, 18: 1.65, 20: 2, 22: 2.45, 24: 2.9, 26: 3.45, 28: 4, 30: 4.6 },
+    16: { 10: 0.4, 12: 0.55, 14: 0.8, 16: 1, 18: 1.3, 20: 1.55, 22: 1.9, 24: 2.25, 26: 2.65, 28: 3.05, 30: 3.5 },
+    18: { 10: 0.3, 12: 0.45, 14: 0.6, 16: 0.8, 18: 1, 20: 1.25, 22: 1.5, 24: 1.8, 26: 2.1, 28: 2.4, 30: 2.8 },
+    20: { 10: 0.25, 12: 0.35, 14: 0.5, 16: 0.65, 18: 0.8, 20: 1, 22: 1.2, 24: 1.45, 26: 1.7, 28: 2, 30: 2.25 },
+    22: { 10: 0.2, 12: 0.3, 14: 0.4, 16: 0.55, 18: 0.65, 20: 0.8, 22: 1, 24: 1.2, 26: 1.4, 28: 1.6, 30: 1.85 },
+    24: { 10: 0.18, 12: 0.25, 14: 0.35, 16: 0.45, 18: 0.55, 20: 0.7, 22: 0.85, 24: 1, 26: 1.2, 28: 1.35, 30: 1.55 },
+    26: { 10: 0.16, 12: 0.21, 14: 0.3, 16: 0.4, 18: 0.5, 20: 0.6, 22: 0.7, 24: 0.85, 26: 1, 28: 1.2, 30: 1.35 },
+    28: { 10: 0.13, 12: 0.18, 14: 0.25, 16: 0.35, 18: 0.4, 20: 0.5, 22: 0.6, 24: 0.75, 26: 0.85, 28: 1, 30: 1.15 },
+    30: { 10: 0.11, 12: 0.16, 14: 0.2, 16: 0.3, 18: 0.35, 20: 0.45, 22: 0.55, 24: 0.65, 26: 0.75, 28: 0.85, 30: 1 }
+};
+
+// Переключение типа пересчета
+recalcType.onchange = () => {
+    if (recalcType.value === 'diameter') {
+        document.getElementById('diameterRecalc').style.display = 'block';
+        document.getElementById('quantityRecalc').style.display = 'none';
+    } else {
+        document.getElementById('diameterRecalc').style.display = 'none';
+        document.getElementById('quantityRecalc').style.display = 'block';
+    }
+};
+
+// Голосовой ввод
 let recognition = null;
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -649,12 +702,52 @@ function setupVoiceInput(buttonId, textareaId) {
     };
 }
 
+// Управление ингредиентами
+function renderIngredients() {
+    const container = document.getElementById('ingredientsList');
+    container.innerHTML = ingredientsList.map((ing, index) => `
+        <div class="ingredient-item">
+            <input type="text" value="${ing}" onchange="updateIngredient(${index}, this.value)">
+            <button onclick="removeIngredient(${index})">×</button>
+        </div>
+    `).join('');
+    
+    document.getElementById('recipeIngredients').value = ingredientsList.join('\n');
+}
+
+function updateIngredient(index, value) {
+    ingredientsList[index] = value;
+    document.getElementById('recipeIngredients').value = ingredientsList.join('\n');
+}
+
+function removeIngredient(index) {
+    ingredientsList.splice(index, 1);
+    renderIngredients();
+}
+
+addIngredientBtn.onclick = () => {
+    const value = newIngredient.value.trim();
+    if (value) {
+        ingredientsList.push(value);
+        renderIngredients();
+        newIngredient.value = '';
+    }
+};
+
+newIngredient.onkeypress = (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        addIngredientBtn.click();
+    }
+};
+
 addBtn.onclick = () => {
     document.getElementById('modalTitle').textContent = 'Новый рецепт';
     recipeForm.reset();
     document.getElementById('recipeId').value = '';
+    ingredientsList = [];
+    renderIngredients();
     modal.style.display = 'block';
-    setupVoiceInput('voiceIngredients', 'recipeIngredients');
     setupVoiceInput('voiceInstructions', 'recipeInstructions');
 };
 
@@ -682,7 +775,6 @@ imageUpload.onchange = (e) => {
     statusDiv.textContent = '⏳ Обработка фото...';
     statusDiv.style.color = '#667eea';
     
-    // Конвертируем в base64 для хранения
     const reader = new FileReader();
     reader.onload = (event) => {
         document.getElementById('recipeImage').value = event.target.result;
@@ -705,6 +797,7 @@ recipeForm.onsubmit = (e) => {
         instructions: document.getElementById('recipeInstructions').value,
         time: document.getElementById('recipeTime').value,
         formSize: document.getElementById('recipeFormSize').value,
+        quantity: document.getElementById('recipeQuantity').value,
         yield: document.getElementById('recipeYield').value,
         createdAt: id ? recipes.find(r => r.id === id).createdAt : new Date().toISOString()
     };
@@ -724,8 +817,6 @@ recipeForm.onsubmit = (e) => {
 
 function saveRecipes() {
     localStorage.setItem('recipes', JSON.stringify(recipes));
-    
-    // Синхронизация с Telegram Cloud Storage
     if (tg.CloudStorage) {
         tg.CloudStorage.setItem('recipes', JSON.stringify(recipes));
     }
@@ -739,9 +830,12 @@ if (tg.CloudStorage) {
             displayRecipes();
         }
     });
+} else {
+    // Если не в Telegram, загружаем из localStorage
+    displayRecipes();
 }
 
-function displayRecipes(filter = '') {
+function displayRecipes() {
     const category = categoryFilter.value;
     const search = searchInput.value.toLowerCase();
     
@@ -770,6 +864,7 @@ function displayRecipes(filter = '') {
                 <div class="recipe-meta">
                     ${recipe.time ? `Время: ${recipe.time} мин` : ''}
                     ${recipe.formSize ? ` | Форма: ${recipe.formSize} см` : ''}
+                    ${recipe.quantity ? ` | Кол-во: ${recipe.quantity} шт` : ''}
                     ${recipe.yield ? ` | Выход: ${recipe.yield}` : ''}
                 </div>
                 <div class="recipe-actions" onclick="event.stopPropagation()">
@@ -801,6 +896,7 @@ function viewRecipe(id) {
         <div class="recipe-meta">
             ${recipe.time ? `Время: ${recipe.time} мин` : ''}
             ${recipe.formSize ? ` | Форма: ${recipe.formSize} см` : ''}
+            ${recipe.quantity ? ` | Кол-во: ${recipe.quantity} шт` : ''}
             ${recipe.yield ? ` | Выход: ${recipe.yield}` : ''}
         </div>
         <h3>Ингредиенты:</h3>
@@ -810,9 +906,11 @@ function viewRecipe(id) {
     `;
     
     const calculator = document.getElementById('calculator');
-    if (recipe.formSize) {
+    if (recipe.formSize || recipe.quantity) {
         calculator.style.display = 'block';
-        document.getElementById('targetFormSize').value = recipe.formSize;
+        if (recipe.formSize) {
+            document.getElementById('targetFormSize').value = recipe.formSize;
+        }
     } else {
         calculator.style.display = 'none';
     }
@@ -821,12 +919,30 @@ function viewRecipe(id) {
 }
 
 function calculateRecipe() {
-    if (!currentRecipe || !currentRecipe.formSize) return;
+    if (!currentRecipe) return;
     
-    const originalSize = parseFloat(currentRecipe.formSize);
-    const targetSize = parseFloat(document.getElementById('targetFormSize').value);
+    const type = recalcType.value;
+    let coefficient = 1;
     
-    const coefficient = Math.pow(targetSize / originalSize, 2);
+    if (type === 'diameter' && currentRecipe.formSize) {
+        const originalSize = parseInt(currentRecipe.formSize);
+        const targetSize = parseInt(document.getElementById('targetFormSize').value);
+        
+        // Используем таблицу коэффициентов
+        if (recalcTable[originalSize] && recalcTable[originalSize][targetSize]) {
+            coefficient = recalcTable[originalSize][targetSize];
+        } else {
+            // Запасной вариант: по площади
+            coefficient = Math.pow(targetSize / originalSize, 2);
+        }
+    } else if (type === 'quantity' && currentRecipe.quantity) {
+        const originalQty = parseFloat(currentRecipe.quantity);
+        const targetQty = parseFloat(document.getElementById('targetQuantity').value);
+        coefficient = targetQty / originalQty;
+    } else {
+        alert('Не указаны данные для пересчета');
+        return;
+    }
     
     const ingredients = currentRecipe.ingredients.split('\n')
         .filter(i => i.trim())
@@ -842,12 +958,17 @@ function calculateRecipe() {
     
     const ingredientsList = ingredients.map(i => `<li>${i}</li>`).join('');
     
+    let title = '';
+    if (type === 'diameter') {
+        title = `Пересчет с ${currentRecipe.formSize} см на ${document.getElementById('targetFormSize').value} см (×${coefficient.toFixed(2)})`;
+    } else {
+        title = `Пересчет с ${currentRecipe.quantity} шт на ${document.getElementById('targetQuantity').value} шт (×${coefficient.toFixed(2)})`;
+    }
+    
     document.getElementById('calculatedResult').innerHTML = `
-        <div style="background: white; padding: 15px; border-radius: 6px; margin-top: 10px;">
-            <h4 style="color: #4CAF50; margin-bottom: 10px;">
-                Пересчет с ${originalSize} см на ${targetSize} см (×${coefficient.toFixed(2)})
-            </h4>
-            <ul style="list-style-position: inside;">${ingredientsList}</ul>
+        <div style="background: white; padding: 15px; border-radius: 8px; margin-top: 10px;">
+            <h4 style="color: #4CAF50; margin-bottom: 10px; font-size: 15px;">${title}</h4>
+            <ul style="list-style-position: inside; font-size: 14px;">${ingredientsList}</ul>
         </div>
     `;
 }
@@ -861,15 +982,16 @@ function editRecipe(id) {
     document.getElementById('recipeName').value = recipe.name;
     document.getElementById('recipeCategory').value = recipe.category;
     document.getElementById('recipeImage').value = recipe.image;
-    document.getElementById('recipeIngredients').value = recipe.ingredients;
     document.getElementById('recipeInstructions').value = recipe.instructions;
     document.getElementById('recipeTime').value = recipe.time;
     document.getElementById('recipeFormSize').value = recipe.formSize || '';
+    document.getElementById('recipeQuantity').value = recipe.quantity || '';
     document.getElementById('recipeYield').value = recipe.yield;
     
-    modal.style.display = 'block';
+    ingredientsList = recipe.ingredients.split('\n').filter(i => i.trim());
+    renderIngredients();
     
-    setupVoiceInput('voiceIngredients', 'recipeIngredients');
+    modal.style.display = 'block';
     setupVoiceInput('voiceInstructions', 'recipeInstructions');
 }
 
