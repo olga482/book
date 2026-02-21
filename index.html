@@ -3,435 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тех.карты десертов</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Технологические карты</h1>
-            <button id="addBtn" class="btn-primary">Добавить рецепт</button>
-        </header>
-
-        <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Поиск по названию...">
-            <select id="categoryFilter">
-                <option value="">Все категории</option>
-                <option value="торты">Торты</option>
-                <option value="пирожные">Пирожные</option>
-                <option value="десерты">Десерты</option>
-                <option value="крема">Крема</option>
-                <option value="муссы">Муссы</option>
-                <option value="бисквиты">Бисквиты</option>
-                <option value="начинки">Начинки</option>
-                <option value="глазури">Глазури</option>
-                <option value="декор">Декор</option>
-                <option value="другое">Другое</option>
-            </select>
-        </div>
-
-        <div id="recipesList" class="recipes-grid"></div>
-
-        <!-- Модальное окно -->
-        <div id="modal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2 id="modalTitle">Новый рецепт</h2>
-                <form id="recipeForm">
-                    <input type="hidden" id="recipeId">
-                    
-                    <label>Название:</label>
-                    <input type="text" id="recipeName" required>
-
-                    <label>Категория:</label>
-                    <select id="recipeCategory" required>
-                        <option value="торты">Торты</option>
-                        <option value="пирожные">Пирожные</option>
-                        <option value="десерты">Десерты</option>
-                        <option value="крема">Крема</option>
-                        <option value="муссы">Муссы</option>
-                        <option value="бисквиты">Бисквиты</option>
-                        <option value="начинки">Начинки</option>
-                        <option value="глазури">Глазури</option>
-                        <option value="декор">Декор</option>
-                        <option value="другое">Другое</option>
-                    </select>
-
-                    <label>Фото (URL или base64):</label>
-                    <input type="text" id="recipeImage" placeholder="https://... или загрузите файл">
-                    <input type="file" id="imageUpload" accept="image/*">
-
-                    <label>Ингредиенты (каждый с новой строки):</label>
-                    <div class="voice-input-container">
-                        <textarea id="recipeIngredients" rows="6" required></textarea>
-                        <button type="button" id="voiceIngredients" class="btn-voice">Голос</button>
-                    </div>
-
-                    <label>Инструкция:</label>
-                    <div class="voice-input-container">
-                        <textarea id="recipeInstructions" rows="8" required></textarea>
-                        <button type="button" id="voiceInstructions" class="btn-voice">Голос</button>
-                    </div>
-
-                    <label>Время приготовления (мин):</label>
-                    <input type="number" id="recipeTime">
-
-                    <label>Размер формы (см):</label>
-                    <select id="recipeFormSize">
-                        <option value="">Не указан</option>
-                        <option value="12">12 см (бенто)</option>
-                        <option value="14">14 см (мини)</option>
-                        <option value="16">16 см</option>
-                        <option value="18">18 см</option>
-                        <option value="20">20 см</option>
-                        <option value="22">22 см</option>
-                        <option value="24">24 см</option>
-                        <option value="26">26 см</option>
-                        <option value="28">28 см (макси)</option>
-                        <option value="30">30 см (макси)</option>
-                    </select>
-
-                    <label>Выход (порций/шт):</label>
-                    <input type="text" id="recipeYield">
-
-                    <div class="form-buttons">
-                        <button type="submit" class="btn-primary">Сохранить</button>
-                        <button type="button" id="cancelBtn" class="btn-secondary">Отмена</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Модальное окно просмотра -->
-        <div id="viewModal" class="modal">
-            <div class="modal-content">
-                <span class="close-view">&times;</span>
-                <div id="recipeView"></div>
-                
-                <!-- Калькулятор пересчета -->
-                <div id="calculator" style="display:none; margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 8px;">
-                    <h3>📐 Пересчет на другой размер</h3>
-                    <label>Пересчитать на форму:</label>
-                    <select id="targetFormSize" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 6px; border: 1px solid #ddd;">
-                        <option value="12">12 см (бенто)</option>
-                        <option value="14">14 см (мини)</option>
-                        <option value="16">16 см</option>
-                        <option value="18">18 см</option>
-                        <option value="20">20 см</option>
-                        <option value="22">22 см</option>
-                        <option value="24">24 см</option>
-                        <option value="26">26 см</option>
-                        <option value="28">28 см (макси)</option>
-                        <option value="30">30 см (макси)</option>
-                    </select>
-                    <button onclick="calculateRecipe()" class="btn-primary" style="width: 100%;">Пересчитать</button>
-                    <div id="calculatedResult" style="margin-top: 15px;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="app.js"></script>
-</body>
-</html>
-// Хранилище рецептов
-let recipes = JSON.parse(localStorage.getItem('recipes')) || [];
-
-// Элементы DOM
-const modal = document.getElementById('modal');
-const viewModal = document.getElementById('viewModal');
-const addBtn = document.getElementById('addBtn');
-const closeBtn = document.querySelector('.close');
-const closeViewBtn = document.querySelector('.close-view');
-const cancelBtn = document.getElementById('cancelBtn');
-const recipeForm = document.getElementById('recipeForm');
-const recipesList = document.getElementById('recipesList');
-const searchInput = document.getElementById('searchInput');
-const categoryFilter = document.getElementById('categoryFilter');
-const imageUpload = document.getElementById('imageUpload');
-
-// Голосовой ввод
-let recognition = null;
-if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognition = new SpeechRecognition();
-    recognition.lang = 'ru-RU';
-    recognition.continuous = true;
-    recognition.interimResults = false;
-}
-
-function setupVoiceInput(buttonId, textareaId) {
-    const button = document.getElementById(buttonId);
-    const textarea = document.getElementById(textareaId);
-    
-    if (!recognition || !button) return;
-    
-    let isRecording = false;
-    
-    button.onclick = () => {
-        if (isRecording) {
-            recognition.stop();
-            button.textContent = 'Голос';
-            button.classList.remove('recording');
-            isRecording = false;
-        } else {
-            recognition.start();
-            button.textContent = 'Стоп';
-            button.classList.add('recording');
-            isRecording = true;
-        }
-    };
-    
-    recognition.onresult = (event) => {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            transcript += event.results[i][0].transcript;
-        }
-        textarea.value += (textarea.value ? '\n' : '') + transcript;
-    };
-    
-    recognition.onerror = () => {
-        button.textContent = 'Голос';
-        button.classList.remove('recording');
-        isRecording = false;
-    };
-    
-    recognition.onend = () => {
-        if (isRecording) {
-            button.textContent = 'Голос';
-            button.classList.remove('recording');
-            isRecording = false;
-        }
-    };
-}
-
-// Открытие модального окна
-addBtn.onclick = () => {
-    document.getElementById('modalTitle').textContent = 'Новый рецепт';
-    recipeForm.reset();
-    document.getElementById('recipeId').value = '';
-    modal.style.display = 'block';
-    
-    // Инициализация голосового ввода
-    setupVoiceInput('voiceIngredients', 'recipeIngredients');
-    setupVoiceInput('voiceInstructions', 'recipeInstructions');
-};
-
-// Закрытие модальных окон
-closeBtn.onclick = () => modal.style.display = 'none';
-closeViewBtn.onclick = () => viewModal.style.display = 'none';
-cancelBtn.onclick = () => modal.style.display = 'none';
-
-window.onclick = (e) => {
-    if (e.target === modal) modal.style.display = 'none';
-    if (e.target === viewModal) viewModal.style.display = 'none';
-};
-
-// Загрузка изображения
-imageUpload.onchange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            document.getElementById('recipeImage').value = event.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-};
-
-// Сохранение рецепта
-recipeForm.onsubmit = (e) => {
-    e.preventDefault();
-    
-    const id = document.getElementById('recipeId').value;
-    const recipe = {
-        id: id || Date.now().toString(),
-        name: document.getElementById('recipeName').value,
-        category: document.getElementById('recipeCategory').value,
-        image: document.getElementById('recipeImage').value || 'https://via.placeholder.com/400x300?text=Нет+фото',
-        ingredients: document.getElementById('recipeIngredients').value,
-        instructions: document.getElementById('recipeInstructions').value,
-        time: document.getElementById('recipeTime').value,
-        formSize: document.getElementById('recipeFormSize').value,
-        yield: document.getElementById('recipeYield').value,
-        createdAt: id ? recipes.find(r => r.id === id).createdAt : new Date().toISOString()
-    };
-
-    if (id) {
-        const index = recipes.findIndex(r => r.id === id);
-        recipes[index] = recipe;
-    } else {
-        recipes.push(recipe);
-    }
-
-    saveRecipes();
-    displayRecipes();
-    modal.style.display = 'none';
-    recipeForm.reset();
-};
-
-// Сохранение в localStorage
-function saveRecipes() {
-    localStorage.setItem('recipes', JSON.stringify(recipes));
-}
-
-// Отображение рецептов
-function displayRecipes(filter = '') {
-    const category = categoryFilter.value;
-    const search = searchInput.value.toLowerCase();
-    
-    const filtered = recipes.filter(recipe => {
-        const matchesCategory = !category || recipe.category === category;
-        const matchesSearch = recipe.name.toLowerCase().includes(search);
-        return matchesCategory && matchesSearch;
-    });
-
-    if (filtered.length === 0) {
-        recipesList.innerHTML = `
-            <div class="empty-state">
-                <h2>Пока нет рецептов</h2>
-                <p>Добавьте свой первый рецепт</p>
-            </div>
-        `;
-        return;
-    }
-
-    recipesList.innerHTML = filtered.map(recipe => `
-        <div class="recipe-card" onclick="viewRecipe('${recipe.id}')">
-            <img src="${recipe.image}" alt="${recipe.name}" onerror="this.src='https://via.placeholder.com/400x300?text=Нет+фото'">
-            <div class="recipe-card-content">
-                <span class="recipe-category">${recipe.category}</span>
-                <h3>${recipe.name}</h3>
-                <div class="recipe-meta">
-                    ${recipe.time ? `Время: ${recipe.time} мин` : ''}
-                    ${recipe.formSize ? ` | Форма: ${recipe.formSize} см` : ''}
-                    ${recipe.yield ? ` | Выход: ${recipe.yield}` : ''}
-                </div>
-                <div class="recipe-actions" onclick="event.stopPropagation()">
-                    <button class="btn-edit" onclick="editRecipe('${recipe.id}')">Изменить</button>
-                    <button class="btn-delete" onclick="deleteRecipe('${recipe.id}')">Удалить</button>
-                </div>
-            </div>
-        </div>
-    `).join('');
-}
-
-// Текущий просматриваемый рецепт
-let currentRecipe = null;
-
-// Просмотр рецепта
-function viewRecipe(id) {
-    const recipe = recipes.find(r => r.id === id);
-    if (!recipe) return;
-    
-    currentRecipe = recipe;
-
-    const ingredientsList = recipe.ingredients.split('\n')
-        .filter(i => i.trim())
-        .map(i => `<li>${i}</li>`)
-        .join('');
-
-    document.getElementById('recipeView').innerHTML = `
-        <img src="${recipe.image}" alt="${recipe.name}" onerror="this.src='https://via.placeholder.com/400x300?text=Нет+фото'">
-        <h2>${recipe.name}</h2>
-        <span class="recipe-category">${recipe.category}</span>
-        <div class="recipe-meta">
-            ${recipe.time ? `Время: ${recipe.time} мин` : ''}
-            ${recipe.formSize ? ` | Форма: ${recipe.formSize} см` : ''}
-            ${recipe.yield ? ` | Выход: ${recipe.yield}` : ''}
-        </div>
-        <h3>Ингредиенты:</h3>
-        <ul>${ingredientsList}</ul>
-        <h3>Инструкция:</h3>
-        <p>${recipe.instructions}</p>
-    `;
-    
-    // Показать калькулятор только если указан размер формы
-    const calculator = document.getElementById('calculator');
-    if (recipe.formSize) {
-        calculator.style.display = 'block';
-        document.getElementById('targetFormSize').value = recipe.formSize;
-    } else {
-        calculator.style.display = 'none';
-    }
-    
-    viewModal.style.display = 'block';
-}
-
-// Калькулятор пересчета
-function calculateRecipe() {
-    if (!currentRecipe || !currentRecipe.formSize) return;
-    
-    const originalSize = parseFloat(currentRecipe.formSize);
-    const targetSize = parseFloat(document.getElementById('targetFormSize').value);
-    
-    // Коэффициент пересчета по площади (для круглых форм)
-    const coefficient = Math.pow(targetSize / originalSize, 2);
-    
-    // Парсим ингредиенты и пересчитываем
-    const ingredients = currentRecipe.ingredients.split('\n')
-        .filter(i => i.trim())
-        .map(line => {
-            // Ищем числа в строке
-            const match = line.match(/(\d+(?:[.,]\d+)?)/);
-            if (match) {
-                const originalAmount = parseFloat(match[1].replace(',', '.'));
-                const newAmount = (originalAmount * coefficient).toFixed(1);
-                return line.replace(match[1], newAmount);
-            }
-            return line;
-        });
-    
-    const ingredientsList = ingredients.map(i => `<li>${i}</li>`).join('');
-    
-    document.getElementById('calculatedResult').innerHTML = `
-        <div style="background: white; padding: 15px; border-radius: 6px; margin-top: 10px;">
-            <h4 style="color: #4CAF50; margin-bottom: 10px;">
-                Пересчет с ${originalSize} см на ${targetSize} см (×${coefficient.toFixed(2)})
-            </h4>
-            <ul style="list-style-position: inside;">${ingredientsList}</ul>
-        </div>
-    `;
-}
-
-// Редактирование рецепта
-function editRecipe(id) {
-    const recipe = recipes.find(r => r.id === id);
-    if (!recipe) return;
-
-    document.getElementById('modalTitle').textContent = 'Редактировать рецепт';
-    document.getElementById('recipeId').value = recipe.id;
-    document.getElementById('recipeName').value = recipe.name;
-    document.getElementById('recipeCategory').value = recipe.category;
-    document.getElementById('recipeImage').value = recipe.image;
-    document.getElementById('recipeIngredients').value = recipe.ingredients;
-    document.getElementById('recipeInstructions').value = recipe.instructions;
-    document.getElementById('recipeTime').value = recipe.time;
-    document.getElementById('recipeFormSize').value = recipe.formSize || '';
-    document.getElementById('recipeYield').value = recipe.yield;
-    
-    modal.style.display = 'block';
-    
-    // Инициализация голосового ввода
-    setupVoiceInput('voiceIngredients', 'recipeIngredients');
-    setupVoiceInput('voiceInstructions', 'recipeInstructions');
-}
-
-// Удаление рецепта
-function deleteRecipe(id) {
-    if (confirm('Удалить этот рецепт?')) {
-        recipes = recipes.filter(r => r.id !== id);
-        saveRecipes();
-        displayRecipes();
-    }
-}
-
-// Поиск и фильтрация
-searchInput.oninput = displayRecipes;
-categoryFilter.onchange = displayRecipes;
-
-// Инициализация
-displayRecipes();
+    <title>Технологические карты</title>
+    <style>
 * {
     margin: 0;
     padding: 0;
@@ -618,7 +191,6 @@ h1 {
     color: white;
 }
 
-/* Модальное окно */
 .modal {
     display: none;
     position: fixed;
@@ -800,7 +372,6 @@ form textarea {
     50% { opacity: 0.6; }
 }
 
-/* Адаптация под телефон */
 @media (max-width: 768px) {
     body {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -878,5 +449,405 @@ form textarea {
         font-size: 1.6em;
     }
 }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Технологические карты</h1>
+            <button id="addBtn" class="btn-primary">Добавить рецепт</button>
+        </header>
 
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Поиск по названию...">
+            <select id="categoryFilter">
+                <option value="">Все категории</option>
+                <option value="торты">Торты</option>
+                <option value="пирожные">Пирожные</option>
+                <option value="десерты">Десерты</option>
+                <option value="крема">Крема</option>
+                <option value="муссы">Муссы</option>
+                <option value="бисквиты">Бисквиты</option>
+                <option value="начинки">Начинки</option>
+                <option value="глазури">Глазури</option>
+                <option value="декор">Декор</option>
+                <option value="другое">Другое</option>
+            </select>
+        </div>
+
+        <div id="recipesList" class="recipes-grid"></div>
+
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 id="modalTitle">Новый рецепт</h2>
+                <form id="recipeForm">
+                    <input type="hidden" id="recipeId">
+                    
+                    <label>Название:</label>
+                    <input type="text" id="recipeName" required>
+
+                    <label>Категория:</label>
+                    <select id="recipeCategory" required>
+                        <option value="торты">Торты</option>
+                        <option value="пирожные">Пирожные</option>
+                        <option value="десерты">Десерты</option>
+                        <option value="крема">Крема</option>
+                        <option value="муссы">Муссы</option>
+                        <option value="бисквиты">Бисквиты</option>
+                        <option value="начинки">Начинки</option>
+                        <option value="глазури">Глазури</option>
+                        <option value="декор">Декор</option>
+                        <option value="другое">Другое</option>
+                    </select>
+
+                    <label>Фото (URL или base64):</label>
+                    <input type="text" id="recipeImage" placeholder="https://... или загрузите файл">
+                    <input type="file" id="imageUpload" accept="image/*">
+
+                    <label>Ингредиенты (каждый с новой строки):</label>
+                    <div class="voice-input-container">
+                        <textarea id="recipeIngredients" rows="6" required></textarea>
+                        <button type="button" id="voiceIngredients" class="btn-voice">Голос</button>
+                    </div>
+
+                    <label>Инструкция:</label>
+                    <div class="voice-input-container">
+                        <textarea id="recipeInstructions" rows="8" required></textarea>
+                        <button type="button" id="voiceInstructions" class="btn-voice">Голос</button>
+                    </div>
+
+                    <label>Время приготовления (мин):</label>
+                    <input type="number" id="recipeTime">
+
+                    <label>Размер формы (см):</label>
+                    <select id="recipeFormSize">
+                        <option value="">Не указан</option>
+                        <option value="12">12 см (бенто)</option>
+                        <option value="14">14 см (мини)</option>
+                        <option value="16">16 см</option>
+                        <option value="18">18 см</option>
+                        <option value="20">20 см</option>
+                        <option value="22">22 см</option>
+                        <option value="24">24 см</option>
+                        <option value="26">26 см</option>
+                        <option value="28">28 см (макси)</option>
+                        <option value="30">30 см (макси)</option>
+                    </select>
+
+                    <label>Выход (порций/шт):</label>
+                    <input type="text" id="recipeYield">
+
+                    <div class="form-buttons">
+                        <button type="submit" class="btn-primary">Сохранить</button>
+                        <button type="button" id="cancelBtn" class="btn-secondary">Отмена</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="viewModal" class="modal">
+            <div class="modal-content">
+                <span class="close-view">&times;</span>
+                <div id="recipeView"></div>
+                
+                <div id="calculator" style="display:none; margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 8px;">
+                    <h3>Пересчет на другой размер</h3>
+                    <label>Пересчитать на форму:</label>
+                    <select id="targetFormSize" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 6px; border: 1px solid #ddd;">
+                        <option value="12">12 см (бенто)</option>
+                        <option value="14">14 см (мини)</option>
+                        <option value="16">16 см</option>
+                        <option value="18">18 см</option>
+                        <option value="20">20 см</option>
+                        <option value="22">22 см</option>
+                        <option value="24">24 см</option>
+                        <option value="26">26 см</option>
+                        <option value="28">28 см (макси)</option>
+                        <option value="30">30 см (макси)</option>
+                    </select>
+                    <button onclick="calculateRecipe()" class="btn-primary" style="width: 100%;">Пересчитать</button>
+                    <div id="calculatedResult" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+let recipes = JSON.parse(localStorage.getItem('recipes')) || [];
+const modal = document.getElementById('modal');
+const viewModal = document.getElementById('viewModal');
+const addBtn = document.getElementById('addBtn');
+const closeBtn = document.querySelector('.close');
+const closeViewBtn = document.querySelector('.close-view');
+const cancelBtn = document.getElementById('cancelBtn');
+const recipeForm = document.getElementById('recipeForm');
+const recipesList = document.getElementById('recipesList');
+const searchInput = document.getElementById('searchInput');
+const categoryFilter = document.getElementById('categoryFilter');
+const imageUpload = document.getElementById('imageUpload');
+
+let recognition = null;
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = 'ru-RU';
+    recognition.continuous = true;
+    recognition.interimResults = false;
+}
+
+function setupVoiceInput(buttonId, textareaId) {
+    const button = document.getElementById(buttonId);
+    const textarea = document.getElementById(textareaId);
     
+    if (!recognition || !button) return;
+    
+    let isRecording = false;
+    
+    button.onclick = () => {
+        if (isRecording) {
+            recognition.stop();
+            button.textContent = 'Голос';
+            button.classList.remove('recording');
+            isRecording = false;
+        } else {
+            recognition.start();
+            button.textContent = 'Стоп';
+            button.classList.add('recording');
+            isRecording = true;
+        }
+    };
+    
+    recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+        }
+        textarea.value += (textarea.value ? '\n' : '') + transcript;
+    };
+    
+    recognition.onerror = () => {
+        button.textContent = 'Голос';
+        button.classList.remove('recording');
+        isRecording = false;
+    };
+    
+    recognition.onend = () => {
+        if (isRecording) {
+            button.textContent = 'Голос';
+            button.classList.remove('recording');
+            isRecording = false;
+        }
+    };
+}
+
+addBtn.onclick = () => {
+    document.getElementById('modalTitle').textContent = 'Новый рецепт';
+    recipeForm.reset();
+    document.getElementById('recipeId').value = '';
+    modal.style.display = 'block';
+    setupVoiceInput('voiceIngredients', 'recipeIngredients');
+    setupVoiceInput('voiceInstructions', 'recipeInstructions');
+};
+
+closeBtn.onclick = () => modal.style.display = 'none';
+closeViewBtn.onclick = () => viewModal.style.display = 'none';
+cancelBtn.onclick = () => modal.style.display = 'none';
+
+window.onclick = (e) => {
+    if (e.target === modal) modal.style.display = 'none';
+    if (e.target === viewModal) viewModal.style.display = 'none';
+};
+
+imageUpload.onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            document.getElementById('recipeImage').value = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+recipeForm.onsubmit = (e) => {
+    e.preventDefault();
+    
+    const id = document.getElementById('recipeId').value;
+    const recipe = {
+        id: id || Date.now().toString(),
+        name: document.getElementById('recipeName').value,
+        category: document.getElementById('recipeCategory').value,
+        image: document.getElementById('recipeImage').value || 'https://via.placeholder.com/400x300?text=Нет+фото',
+        ingredients: document.getElementById('recipeIngredients').value,
+        instructions: document.getElementById('recipeInstructions').value,
+        time: document.getElementById('recipeTime').value,
+        formSize: document.getElementById('recipeFormSize').value,
+        yield: document.getElementById('recipeYield').value,
+        createdAt: id ? recipes.find(r => r.id === id).createdAt : new Date().toISOString()
+    };
+
+    if (id) {
+        const index = recipes.findIndex(r => r.id === id);
+        recipes[index] = recipe;
+    } else {
+        recipes.push(recipe);
+    }
+
+    saveRecipes();
+    displayRecipes();
+    modal.style.display = 'none';
+    recipeForm.reset();
+};
+
+function saveRecipes() {
+    localStorage.setItem('recipes', JSON.stringify(recipes));
+}
+
+function displayRecipes(filter = '') {
+    const category = categoryFilter.value;
+    const search = searchInput.value.toLowerCase();
+    
+    const filtered = recipes.filter(recipe => {
+        const matchesCategory = !category || recipe.category === category;
+        const matchesSearch = recipe.name.toLowerCase().includes(search);
+        return matchesCategory && matchesSearch;
+    });
+
+    if (filtered.length === 0) {
+        recipesList.innerHTML = `
+            <div class="empty-state">
+                <h2>Пока нет рецептов</h2>
+                <p>Добавьте свой первый рецепт</p>
+            </div>
+        `;
+        return;
+    }
+
+    recipesList.innerHTML = filtered.map(recipe => `
+        <div class="recipe-card" onclick="viewRecipe('${recipe.id}')">
+            <img src="${recipe.image}" alt="${recipe.name}" onerror="this.src='https://via.placeholder.com/400x300?text=Нет+фото'">
+            <div class="recipe-card-content">
+                <span class="recipe-category">${recipe.category}</span>
+                <h3>${recipe.name}</h3>
+                <div class="recipe-meta">
+                    ${recipe.time ? `Время: ${recipe.time} мин` : ''}
+                    ${recipe.formSize ? ` | Форма: ${recipe.formSize} см` : ''}
+                    ${recipe.yield ? ` | Выход: ${recipe.yield}` : ''}
+                </div>
+                <div class="recipe-actions" onclick="event.stopPropagation()">
+                    <button class="btn-edit" onclick="editRecipe('${recipe.id}')">Изменить</button>
+                    <button class="btn-delete" onclick="deleteRecipe('${recipe.id}')">Удалить</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+let currentRecipe = null;
+
+function viewRecipe(id) {
+    const recipe = recipes.find(r => r.id === id);
+    if (!recipe) return;
+    
+    currentRecipe = recipe;
+
+    const ingredientsList = recipe.ingredients.split('\n')
+        .filter(i => i.trim())
+        .map(i => `<li>${i}</li>`)
+        .join('');
+
+    document.getElementById('recipeView').innerHTML = `
+        <img src="${recipe.image}" alt="${recipe.name}" onerror="this.src='https://via.placeholder.com/400x300?text=Нет+фото'">
+        <h2>${recipe.name}</h2>
+        <span class="recipe-category">${recipe.category}</span>
+        <div class="recipe-meta">
+            ${recipe.time ? `Время: ${recipe.time} мин` : ''}
+            ${recipe.formSize ? ` | Форма: ${recipe.formSize} см` : ''}
+            ${recipe.yield ? ` | Выход: ${recipe.yield}` : ''}
+        </div>
+        <h3>Ингредиенты:</h3>
+        <ul>${ingredientsList}</ul>
+        <h3>Инструкция:</h3>
+        <p>${recipe.instructions}</p>
+    `;
+    
+    const calculator = document.getElementById('calculator');
+    if (recipe.formSize) {
+        calculator.style.display = 'block';
+        document.getElementById('targetFormSize').value = recipe.formSize;
+    } else {
+        calculator.style.display = 'none';
+    }
+    
+    viewModal.style.display = 'block';
+}
+
+function calculateRecipe() {
+    if (!currentRecipe || !currentRecipe.formSize) return;
+    
+    const originalSize = parseFloat(currentRecipe.formSize);
+    const targetSize = parseFloat(document.getElementById('targetFormSize').value);
+    
+    const coefficient = Math.pow(targetSize / originalSize, 2);
+    
+    const ingredients = currentRecipe.ingredients.split('\n')
+        .filter(i => i.trim())
+        .map(line => {
+            const match = line.match(/(\d+(?:[.,]\d+)?)/);
+            if (match) {
+                const originalAmount = parseFloat(match[1].replace(',', '.'));
+                const newAmount = (originalAmount * coefficient).toFixed(1);
+                return line.replace(match[1], newAmount);
+            }
+            return line;
+        });
+    
+    const ingredientsList = ingredients.map(i => `<li>${i}</li>`).join('');
+    
+    document.getElementById('calculatedResult').innerHTML = `
+        <div style="background: white; padding: 15px; border-radius: 6px; margin-top: 10px;">
+            <h4 style="color: #4CAF50; margin-bottom: 10px;">
+                Пересчет с ${originalSize} см на ${targetSize} см (×${coefficient.toFixed(2)})
+            </h4>
+            <ul style="list-style-position: inside;">${ingredientsList}</ul>
+        </div>
+    `;
+}
+
+function editRecipe(id) {
+    const recipe = recipes.find(r => r.id === id);
+    if (!recipe) return;
+
+    document.getElementById('modalTitle').textContent = 'Редактировать рецепт';
+    document.getElementById('recipeId').value = recipe.id;
+    document.getElementById('recipeName').value = recipe.name;
+    document.getElementById('recipeCategory').value = recipe.category;
+    document.getElementById('recipeImage').value = recipe.image;
+    document.getElementById('recipeIngredients').value = recipe.ingredients;
+    document.getElementById('recipeInstructions').value = recipe.instructions;
+    document.getElementById('recipeTime').value = recipe.time;
+    document.getElementById('recipeFormSize').value = recipe.formSize || '';
+    document.getElementById('recipeYield').value = recipe.yield;
+    
+    modal.style.display = 'block';
+    
+    setupVoiceInput('voiceIngredients', 'recipeIngredients');
+    setupVoiceInput('voiceInstructions', 'recipeInstructions');
+}
+
+function deleteRecipe(id) {
+    if (confirm('Удалить этот рецепт?')) {
+        recipes = recipes.filter(r => r.id !== id);
+        saveRecipes();
+        displayRecipes();
+    }
+}
+
+searchInput.oninput = displayRecipes;
+categoryFilter.onchange = displayRecipes;
+
+displayRecipes();
+    </script>
+</body>
+</html>
