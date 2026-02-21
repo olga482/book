@@ -134,6 +134,304 @@
     <script src="app.js"></script>
 </body>
 </html>
+// Хранилище рецептов
+let recipes = JSON.parse(localStorage.getItem('recipes')) || [];
+
+// Элементы DOM
+const modal = document.getElementById('modal');
+const viewModal = document.getElementById('viewModal');
+const addBtn = document.getElementById('addBtn');
+const closeBtn = document.querySelector('.close');
+const closeViewBtn = document.querySelector('.close-view');
+const cancelBtn = document.getElementById('cancelBtn');
+const recipeForm = document.getElementById('recipeForm');
+const recipesList = document.getElementById('recipesList');
+const searchInput = document.getElementById('searchInput');
+const categoryFilter = document.getElementById('categoryFilter');
+const imageUpload = document.getElementById('imageUpload');
+
+// Голосовой ввод
+let recognition = null;
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = 'ru-RU';
+    recognition.continuous = true;
+    recognition.interimResults = false;
+}
+
+function setupVoiceInput(buttonId, textareaId) {
+    const button = document.getElementById(buttonId);
+    const textarea = document.getElementById(textareaId);
+    
+    if (!recognition || !button) return;
+    
+    let isRecording = false;
+    
+    button.onclick = () => {
+        if (isRecording) {
+            recognition.stop();
+            button.textContent = 'Голос';
+            button.classList.remove('recording');
+            isRecording = false;
+        } else {
+            recognition.start();
+            button.textContent = 'Стоп';
+            button.classList.add('recording');
+            isRecording = true;
+        }
+    };
+    
+    recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+        }
+        textarea.value += (textarea.value ? '\n' : '') + transcript;
+    };
+    
+    recognition.onerror = () => {
+        button.textContent = 'Голос';
+        button.classList.remove('recording');
+        isRecording = false;
+    };
+    
+    recognition.onend = () => {
+        if (isRecording) {
+            button.textContent = 'Голос';
+            button.classList.remove('recording');
+            isRecording = false;
+        }
+    };
+}
+
+// Открытие модального окна
+addBtn.onclick = () => {
+    document.getElementById('modalTitle').textContent = 'Новый рецепт';
+    recipeForm.reset();
+    document.getElementById('recipeId').value = '';
+    modal.style.display = 'block';
+    
+    // Инициализация голосового ввода
+    setupVoiceInput('voiceIngredients', 'recipeIngredients');
+    setupVoiceInput('voiceInstructions', 'recipeInstructions');
+};
+
+// Закрытие модальных окон
+closeBtn.onclick = () => modal.style.display = 'none';
+closeViewBtn.onclick = () => viewModal.style.display = 'none';
+cancelBtn.onclick = () => modal.style.display = 'none';
+
+window.onclick = (e) => {
+    if (e.target === modal) modal.style.display = 'none';
+    if (e.target === viewModal) viewModal.style.display = 'none';
+};
+
+// Загрузка изображения
+imageUpload.onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            document.getElementById('recipeImage').value = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+// Сохранение рецепта
+recipeForm.onsubmit = (e) => {
+    e.preventDefault();
+    
+    const id = document.getElementById('recipeId').value;
+    const recipe = {
+        id: id || Date.now().toString(),
+        name: document.getElementById('recipeName').value,
+        category: document.getElementById('recipeCategory').value,
+        image: document.getElementById('recipeImage').value || 'https://via.placeholder.com/400x300?text=Нет+фото',
+        ingredients: document.getElementById('recipeIngredients').value,
+        instructions: document.getElementById('recipeInstructions').value,
+        time: document.getElementById('recipeTime').value,
+        formSize: document.getElementById('recipeFormSize').value,
+        yield: document.getElementById('recipeYield').value,
+        createdAt: id ? recipes.find(r => r.id === id).createdAt : new Date().toISOString()
+    };
+
+    if (id) {
+        const index = recipes.findIndex(r => r.id === id);
+        recipes[index] = recipe;
+    } else {
+        recipes.push(recipe);
+    }
+
+    saveRecipes();
+    displayRecipes();
+    modal.style.display = 'none';
+    recipeForm.reset();
+};
+
+// Сохранение в localStorage
+function saveRecipes() {
+    localStorage.setItem('recipes', JSON.stringify(recipes));
+}
+
+// Отображение рецептов
+function displayRecipes(filter = '') {
+    const category = categoryFilter.value;
+    const search = searchInput.value.toLowerCase();
+    
+    const filtered = recipes.filter(recipe => {
+        const matchesCategory = !category || recipe.category === category;
+        const matchesSearch = recipe.name.toLowerCase().includes(search);
+        return matchesCategory && matchesSearch;
+    });
+
+    if (filtered.length === 0) {
+        recipesList.innerHTML = `
+            <div class="empty-state">
+                <h2>Пока нет рецептов</h2>
+                <p>Добавьте свой первый рецепт</p>
+            </div>
+        `;
+        return;
+    }
+
+    recipesList.innerHTML = filtered.map(recipe => `
+        <div class="recipe-card" onclick="viewRecipe('${recipe.id}')">
+            <img src="${recipe.image}" alt="${recipe.name}" onerror="this.src='https://via.placeholder.com/400x300?text=Нет+фото'">
+            <div class="recipe-card-content">
+                <span class="recipe-category">${recipe.category}</span>
+                <h3>${recipe.name}</h3>
+                <div class="recipe-meta">
+                    ${recipe.time ? `Время: ${recipe.time} мин` : ''}
+                    ${recipe.formSize ? ` | Форма: ${recipe.formSize} см` : ''}
+                    ${recipe.yield ? ` | Выход: ${recipe.yield}` : ''}
+                </div>
+                <div class="recipe-actions" onclick="event.stopPropagation()">
+                    <button class="btn-edit" onclick="editRecipe('${recipe.id}')">Изменить</button>
+                    <button class="btn-delete" onclick="deleteRecipe('${recipe.id}')">Удалить</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Текущий просматриваемый рецепт
+let currentRecipe = null;
+
+// Просмотр рецепта
+function viewRecipe(id) {
+    const recipe = recipes.find(r => r.id === id);
+    if (!recipe) return;
+    
+    currentRecipe = recipe;
+
+    const ingredientsList = recipe.ingredients.split('\n')
+        .filter(i => i.trim())
+        .map(i => `<li>${i}</li>`)
+        .join('');
+
+    document.getElementById('recipeView').innerHTML = `
+        <img src="${recipe.image}" alt="${recipe.name}" onerror="this.src='https://via.placeholder.com/400x300?text=Нет+фото'">
+        <h2>${recipe.name}</h2>
+        <span class="recipe-category">${recipe.category}</span>
+        <div class="recipe-meta">
+            ${recipe.time ? `Время: ${recipe.time} мин` : ''}
+            ${recipe.formSize ? ` | Форма: ${recipe.formSize} см` : ''}
+            ${recipe.yield ? ` | Выход: ${recipe.yield}` : ''}
+        </div>
+        <h3>Ингредиенты:</h3>
+        <ul>${ingredientsList}</ul>
+        <h3>Инструкция:</h3>
+        <p>${recipe.instructions}</p>
+    `;
+    
+    // Показать калькулятор только если указан размер формы
+    const calculator = document.getElementById('calculator');
+    if (recipe.formSize) {
+        calculator.style.display = 'block';
+        document.getElementById('targetFormSize').value = recipe.formSize;
+    } else {
+        calculator.style.display = 'none';
+    }
+    
+    viewModal.style.display = 'block';
+}
+
+// Калькулятор пересчета
+function calculateRecipe() {
+    if (!currentRecipe || !currentRecipe.formSize) return;
+    
+    const originalSize = parseFloat(currentRecipe.formSize);
+    const targetSize = parseFloat(document.getElementById('targetFormSize').value);
+    
+    // Коэффициент пересчета по площади (для круглых форм)
+    const coefficient = Math.pow(targetSize / originalSize, 2);
+    
+    // Парсим ингредиенты и пересчитываем
+    const ingredients = currentRecipe.ingredients.split('\n')
+        .filter(i => i.trim())
+        .map(line => {
+            // Ищем числа в строке
+            const match = line.match(/(\d+(?:[.,]\d+)?)/);
+            if (match) {
+                const originalAmount = parseFloat(match[1].replace(',', '.'));
+                const newAmount = (originalAmount * coefficient).toFixed(1);
+                return line.replace(match[1], newAmount);
+            }
+            return line;
+        });
+    
+    const ingredientsList = ingredients.map(i => `<li>${i}</li>`).join('');
+    
+    document.getElementById('calculatedResult').innerHTML = `
+        <div style="background: white; padding: 15px; border-radius: 6px; margin-top: 10px;">
+            <h4 style="color: #4CAF50; margin-bottom: 10px;">
+                Пересчет с ${originalSize} см на ${targetSize} см (×${coefficient.toFixed(2)})
+            </h4>
+            <ul style="list-style-position: inside;">${ingredientsList}</ul>
+        </div>
+    `;
+}
+
+// Редактирование рецепта
+function editRecipe(id) {
+    const recipe = recipes.find(r => r.id === id);
+    if (!recipe) return;
+
+    document.getElementById('modalTitle').textContent = 'Редактировать рецепт';
+    document.getElementById('recipeId').value = recipe.id;
+    document.getElementById('recipeName').value = recipe.name;
+    document.getElementById('recipeCategory').value = recipe.category;
+    document.getElementById('recipeImage').value = recipe.image;
+    document.getElementById('recipeIngredients').value = recipe.ingredients;
+    document.getElementById('recipeInstructions').value = recipe.instructions;
+    document.getElementById('recipeTime').value = recipe.time;
+    document.getElementById('recipeFormSize').value = recipe.formSize || '';
+    document.getElementById('recipeYield').value = recipe.yield;
+    
+    modal.style.display = 'block';
+    
+    // Инициализация голосового ввода
+    setupVoiceInput('voiceIngredients', 'recipeIngredients');
+    setupVoiceInput('voiceInstructions', 'recipeInstructions');
+}
+
+// Удаление рецепта
+function deleteRecipe(id) {
+    if (confirm('Удалить этот рецепт?')) {
+        recipes = recipes.filter(r => r.id !== id);
+        saveRecipes();
+        displayRecipes();
+    }
+}
+
+// Поиск и фильтрация
+searchInput.oninput = displayRecipes;
+categoryFilter.onchange = displayRecipes;
+
+// Инициализация
+displayRecipes();
 * {
     margin: 0;
     padding: 0;
@@ -580,301 +878,5 @@ form textarea {
         font-size: 1.6em;
     }
 }
-// Хранилище рецептов
-let recipes = JSON.parse(localStorage.getItem('recipes')) || [];
 
-// Элементы DOM
-const modal = document.getElementById('modal');
-const viewModal = document.getElementById('viewModal');
-const addBtn = document.getElementById('addBtn');
-const closeBtn = document.querySelector('.close');
-const closeViewBtn = document.querySelector('.close-view');
-const cancelBtn = document.getElementById('cancelBtn');
-const recipeForm = document.getElementById('recipeForm');
-const recipesList = document.getElementById('recipesList');
-const searchInput = document.getElementById('searchInput');
-const categoryFilter = document.getElementById('categoryFilter');
-const imageUpload = document.getElementById('imageUpload');
-
-// Голосовой ввод
-let recognition = null;
-if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognition = new SpeechRecognition();
-    recognition.lang = 'ru-RU';
-    recognition.continuous = true;
-    recognition.interimResults = false;
-}
-
-function setupVoiceInput(buttonId, textareaId) {
-    const button = document.getElementById(buttonId);
-    const textarea = document.getElementById(textareaId);
     
-    if (!recognition || !button) return;
-    
-    let isRecording = false;
-    
-    button.onclick = () => {
-        if (isRecording) {
-            recognition.stop();
-            button.textContent = 'Голос';
-            button.classList.remove('recording');
-            isRecording = false;
-        } else {
-            recognition.start();
-            button.textContent = 'Стоп';
-            button.classList.add('recording');
-            isRecording = true;
-        }
-    };
-    
-    recognition.onresult = (event) => {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            transcript += event.results[i][0].transcript;
-        }
-        textarea.value += (textarea.value ? '\n' : '') + transcript;
-    };
-    
-    recognition.onerror = () => {
-        button.textContent = 'Голос';
-        button.classList.remove('recording');
-        isRecording = false;
-    };
-    
-    recognition.onend = () => {
-        if (isRecording) {
-            button.textContent = 'Голос';
-            button.classList.remove('recording');
-            isRecording = false;
-        }
-    };
-}
-
-// Открытие модального окна
-addBtn.onclick = () => {
-    document.getElementById('modalTitle').textContent = 'Новый рецепт';
-    recipeForm.reset();
-    document.getElementById('recipeId').value = '';
-    modal.style.display = 'block';
-    
-    // Инициализация голосового ввода
-    setupVoiceInput('voiceIngredients', 'recipeIngredients');
-    setupVoiceInput('voiceInstructions', 'recipeInstructions');
-};
-
-// Закрытие модальных окон
-closeBtn.onclick = () => modal.style.display = 'none';
-closeViewBtn.onclick = () => viewModal.style.display = 'none';
-cancelBtn.onclick = () => modal.style.display = 'none';
-
-window.onclick = (e) => {
-    if (e.target === modal) modal.style.display = 'none';
-    if (e.target === viewModal) viewModal.style.display = 'none';
-};
-
-// Загрузка изображения
-imageUpload.onchange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            document.getElementById('recipeImage').value = event.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-};
-
-// Сохранение рецепта
-recipeForm.onsubmit = (e) => {
-    e.preventDefault();
-    
-    const id = document.getElementById('recipeId').value;
-    const recipe = {
-        id: id || Date.now().toString(),
-        name: document.getElementById('recipeName').value,
-        category: document.getElementById('recipeCategory').value,
-        image: document.getElementById('recipeImage').value || 'https://via.placeholder.com/400x300?text=Нет+фото',
-        ingredients: document.getElementById('recipeIngredients').value,
-        instructions: document.getElementById('recipeInstructions').value,
-        time: document.getElementById('recipeTime').value,
-        formSize: document.getElementById('recipeFormSize').value,
-        yield: document.getElementById('recipeYield').value,
-        createdAt: id ? recipes.find(r => r.id === id).createdAt : new Date().toISOString()
-    };
-
-    if (id) {
-        const index = recipes.findIndex(r => r.id === id);
-        recipes[index] = recipe;
-    } else {
-        recipes.push(recipe);
-    }
-
-    saveRecipes();
-    displayRecipes();
-    modal.style.display = 'none';
-    recipeForm.reset();
-};
-
-// Сохранение в localStorage
-function saveRecipes() {
-    localStorage.setItem('recipes', JSON.stringify(recipes));
-}
-
-// Отображение рецептов
-function displayRecipes(filter = '') {
-    const category = categoryFilter.value;
-    const search = searchInput.value.toLowerCase();
-    
-    const filtered = recipes.filter(recipe => {
-        const matchesCategory = !category || recipe.category === category;
-        const matchesSearch = recipe.name.toLowerCase().includes(search);
-        return matchesCategory && matchesSearch;
-    });
-
-    if (filtered.length === 0) {
-        recipesList.innerHTML = `
-            <div class="empty-state">
-                <h2>Пока нет рецептов</h2>
-                <p>Добавьте свой первый рецепт</p>
-            </div>
-        `;
-        return;
-    }
-
-    recipesList.innerHTML = filtered.map(recipe => `
-        <div class="recipe-card" onclick="viewRecipe('${recipe.id}')">
-            <img src="${recipe.image}" alt="${recipe.name}" onerror="this.src='https://via.placeholder.com/400x300?text=Нет+фото'">
-            <div class="recipe-card-content">
-                <span class="recipe-category">${recipe.category}</span>
-                <h3>${recipe.name}</h3>
-                <div class="recipe-meta">
-                    ${recipe.time ? `Время: ${recipe.time} мин` : ''}
-                    ${recipe.formSize ? ` | Форма: ${recipe.formSize} см` : ''}
-                    ${recipe.yield ? ` | Выход: ${recipe.yield}` : ''}
-                </div>
-                <div class="recipe-actions" onclick="event.stopPropagation()">
-                    <button class="btn-edit" onclick="editRecipe('${recipe.id}')">Изменить</button>
-                    <button class="btn-delete" onclick="deleteRecipe('${recipe.id}')">Удалить</button>
-                </div>
-            </div>
-        </div>
-    `).join('');
-}
-
-// Текущий просматриваемый рецепт
-let currentRecipe = null;
-
-// Просмотр рецепта
-function viewRecipe(id) {
-    const recipe = recipes.find(r => r.id === id);
-    if (!recipe) return;
-    
-    currentRecipe = recipe;
-
-    const ingredientsList = recipe.ingredients.split('\n')
-        .filter(i => i.trim())
-        .map(i => `<li>${i}</li>`)
-        .join('');
-
-    document.getElementById('recipeView').innerHTML = `
-        <img src="${recipe.image}" alt="${recipe.name}" onerror="this.src='https://via.placeholder.com/400x300?text=Нет+фото'">
-        <h2>${recipe.name}</h2>
-        <span class="recipe-category">${recipe.category}</span>
-        <div class="recipe-meta">
-            ${recipe.time ? `Время: ${recipe.time} мин` : ''}
-            ${recipe.formSize ? ` | Форма: ${recipe.formSize} см` : ''}
-            ${recipe.yield ? ` | Выход: ${recipe.yield}` : ''}
-        </div>
-        <h3>Ингредиенты:</h3>
-        <ul>${ingredientsList}</ul>
-        <h3>Инструкция:</h3>
-        <p>${recipe.instructions}</p>
-    `;
-    
-    // Показать калькулятор только если указан размер формы
-    const calculator = document.getElementById('calculator');
-    if (recipe.formSize) {
-        calculator.style.display = 'block';
-        document.getElementById('targetFormSize').value = recipe.formSize;
-    } else {
-        calculator.style.display = 'none';
-    }
-    
-    viewModal.style.display = 'block';
-}
-
-// Калькулятор пересчета
-function calculateRecipe() {
-    if (!currentRecipe || !currentRecipe.formSize) return;
-    
-    const originalSize = parseFloat(currentRecipe.formSize);
-    const targetSize = parseFloat(document.getElementById('targetFormSize').value);
-    
-    // Коэффициент пересчета по площади (для круглых форм)
-    const coefficient = Math.pow(targetSize / originalSize, 2);
-    
-    // Парсим ингредиенты и пересчитываем
-    const ingredients = currentRecipe.ingredients.split('\n')
-        .filter(i => i.trim())
-        .map(line => {
-            // Ищем числа в строке
-            const match = line.match(/(\d+(?:[.,]\d+)?)/);
-            if (match) {
-                const originalAmount = parseFloat(match[1].replace(',', '.'));
-                const newAmount = (originalAmount * coefficient).toFixed(1);
-                return line.replace(match[1], newAmount);
-            }
-            return line;
-        });
-    
-    const ingredientsList = ingredients.map(i => `<li>${i}</li>`).join('');
-    
-    document.getElementById('calculatedResult').innerHTML = `
-        <div style="background: white; padding: 15px; border-radius: 6px; margin-top: 10px;">
-            <h4 style="color: #4CAF50; margin-bottom: 10px;">
-                Пересчет с ${originalSize} см на ${targetSize} см (×${coefficient.toFixed(2)})
-            </h4>
-            <ul style="list-style-position: inside;">${ingredientsList}</ul>
-        </div>
-    `;
-}
-
-// Редактирование рецепта
-function editRecipe(id) {
-    const recipe = recipes.find(r => r.id === id);
-    if (!recipe) return;
-
-    document.getElementById('modalTitle').textContent = 'Редактировать рецепт';
-    document.getElementById('recipeId').value = recipe.id;
-    document.getElementById('recipeName').value = recipe.name;
-    document.getElementById('recipeCategory').value = recipe.category;
-    document.getElementById('recipeImage').value = recipe.image;
-    document.getElementById('recipeIngredients').value = recipe.ingredients;
-    document.getElementById('recipeInstructions').value = recipe.instructions;
-    document.getElementById('recipeTime').value = recipe.time;
-    document.getElementById('recipeFormSize').value = recipe.formSize || '';
-    document.getElementById('recipeYield').value = recipe.yield;
-    
-    modal.style.display = 'block';
-    
-    // Инициализация голосового ввода
-    setupVoiceInput('voiceIngredients', 'recipeIngredients');
-    setupVoiceInput('voiceInstructions', 'recipeInstructions');
-}
-
-// Удаление рецепта
-function deleteRecipe(id) {
-    if (confirm('Удалить этот рецепт?')) {
-        recipes = recipes.filter(r => r.id !== id);
-        saveRecipes();
-        displayRecipes();
-    }
-}
-
-// Поиск и фильтрация
-searchInput.oninput = displayRecipes;
-categoryFilter.onchange = displayRecipes;
-
-// Инициализация
-displayRecipes();
