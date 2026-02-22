@@ -14,7 +14,8 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-size: 15px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #1a1a1a;
+    color: #ffffff;
     min-height: 100vh;
     padding: 0;
 }
@@ -25,93 +26,115 @@ button, input, select, textarea {
 }
 
 .container {
-    max-width: 1400px;
+    max-width: 500px;
     margin: 0 auto;
     padding: 20px;
+    padding-bottom: 80px;
 }
 
 header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    text-align: center;
     margin-bottom: 30px;
-    gap: 20px;
+    padding-top: 20px;
 }
 
 h1 {
-    color: white;
-    font-size: 24px;
-    font-weight: 600;
+    color: #ffffff;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 10px;
 }
 
-.btn-primary, .btn-secondary, .btn-edit, .btn-delete, .btn-voice, .btn-add-ingredient {
+.subtitle {
+    color: #999;
+    font-size: 14px;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.tab {
+    background: #2a2a2a;
+    color: #999;
     border: none;
-    padding: 12px 24px;
-    border-radius: 12px;
+    padding: 10px 20px;
+    border-radius: 20px;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
+    white-space: nowrap;
     transition: all 0.3s ease;
 }
 
-.btn-primary {
-    background: white;
-    color: #667eea;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-.btn-secondary {
-    background: #e0e0e0;
-    color: #333;
-}
-
-.btn-add-ingredient {
-    background: #4CAF50;
-    color: white;
-    padding: 10px 20px;
+.tab.active {
+    background: linear-gradient(135deg, #ff9a3c 0%, #ff6b35 100%);
+    color: #ffffff;
 }
 
 .search-bar {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 15px;
+    background: #2a2a2a;
+    border-radius: 15px;
+    padding: 12px 20px;
     margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.search-bar input,
-.search-bar select {
-    padding: 15px 20px;
+.search-bar input {
+    background: transparent;
     border: none;
-    border-radius: 15px;
-    font-size: 15px;
-    background: rgba(255,255,255,0.95);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    color: #ffffff;
+    flex: 1;
+    outline: none;
+}
+
+.search-bar input::placeholder {
+    color: #666;
 }
 
 .recipes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 25px;
+    gap: 20px;
 }
 
 .recipe-card {
-    background: white;
+    background: #2a2a2a;
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-    transition: all 0.3s ease;
     cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.recipe-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+.recipe-card:active {
+    transform: scale(0.98);
 }
 
-.recipe-card img {
+.recipe-image-container {
+    position: relative;
     width: 100%;
-    height: 220px;
+    height: 200px;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.recipe-image-container img {
+    width: 180px;
+    height: 180px;
     object-fit: cover;
+    border-radius: 50%;
 }
 
 .recipe-card-content {
@@ -119,45 +142,67 @@ h1 {
 }
 
 .recipe-card h3 {
-    margin-bottom: 10px;
-    color: #1a1a1a;
-    font-size: 18px;
+    color: #ffffff;
+    font-size: 20px;
     font-weight: 700;
-}
-
-.recipe-category {
-    display: inline-block;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 11px;
-    margin-bottom: 12px;
-    text-transform: uppercase;
-    font-weight: 600;
+    margin-bottom: 10px;
 }
 
 .recipe-meta {
     color: #999;
     font-size: 13px;
-    margin-top: 10px;
+    margin-bottom: 15px;
 }
 
 .recipe-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    margin-top: 15px;
 }
 
-.btn-edit {
-    background: #f0f0f0;
-    color: #333;
+.btn-edit, .btn-delete {
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    background: transparent;
+    color: #999;
+    transition: all 0.3s ease;
 }
 
-.btn-delete {
-    background: #f0f0f0;
-    color: #e74c3c;
+.btn-edit:active {
+    background: #ff9a3c;
+    color: #1a1a1a;
+    border-color: #ff9a3c;
+}
+
+.btn-delete:active {
+    background: #ff4444;
+    color: #ffffff;
+    border-color: #ff4444;
+}
+
+.fab {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #ff9a3c 0%, #ff6b35 100%);
+    border: none;
+    border-radius: 50%;
+    color: #ffffff;
+    font-size: 28px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(255, 154, 60, 0.4);
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.fab:active {
+    transform: scale(0.9);
 }
 
 .modal {
@@ -168,34 +213,36 @@ h1 {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.7);
+    background-color: #1a1a1a;
     overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 20px;
+    border-bottom: 1px solid #2a2a2a;
 }
 
-.modal-content {
-    background-color: white;
-    margin: 40px auto;
-    padding: 40px;
-    border-radius: 25px;
-    max-width: 650px;
-    position: relative;
+.modal-header h2 {
+    font-size: 24px;
+    font-weight: 700;
 }
 
-.close, .close-view {
-    position: absolute;
-    right: 20px;
-    top: 20px;
+.close {
     font-size: 28px;
-    cursor: pointer;
     color: #999;
+    cursor: pointer;
     width: 40px;
     height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    background: #f5f5f5;
+}
+
+.modal-content {
+    padding: 20px;
 }
 
 form label {
@@ -203,7 +250,7 @@ form label {
     margin-top: 20px;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #333;
+    color: #ffffff;
     font-size: 14px;
 }
 
@@ -212,9 +259,11 @@ form select,
 form textarea {
     width: 100%;
     padding: 12px 16px;
-    border: 2px solid #e0e0e0;
+    border: 1px solid #2a2a2a;
     border-radius: 12px;
     font-size: 15px;
+    background: #2a2a2a;
+    color: #ffffff;
     transition: all 0.3s ease;
 }
 
@@ -222,7 +271,11 @@ form input:focus,
 form select:focus,
 form textarea:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #ff9a3c;
+}
+
+form textarea {
+    resize: vertical;
 }
 
 .ingredient-row {
@@ -241,7 +294,7 @@ form textarea:focus {
 
 .ingredient-row button {
     padding: 10px;
-    background: #e74c3c;
+    background: #ff4444;
     color: white;
     border: none;
     border-radius: 8px;
@@ -257,8 +310,8 @@ form textarea:focus {
     top: 100%;
     left: 0;
     right: 0;
-    background: white;
-    border: 2px solid #667eea;
+    background: #2a2a2a;
+    border: 1px solid #ff9a3c;
     border-radius: 8px;
     max-height: 200px;
     overflow-y: auto;
@@ -269,58 +322,69 @@ form textarea:focus {
 .product-dropdown div {
     padding: 10px;
     cursor: pointer;
+    color: #ffffff;
 }
 
 .product-dropdown div:hover {
-    background: #f0f0f0;
+    background: #3a3a3a;
 }
 
-.form-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
+.btn-add-ingredient {
+    background: transparent;
+    border: 2px dashed #444;
+    color: #999;
+    padding: 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #ff9a3c 0%, #ff6b35 100%);
+    color: #ffffff;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+    width: 100%;
     margin-top: 30px;
 }
 
+.btn-secondary {
+    background: transparent;
+    border: 1px solid #444;
+    color: #999;
+    padding: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-state h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.empty-state p {
+    color: #666;
+}
+
 @media (max-width: 768px) {
-    .container {
-        padding: 15px;
-    }
-    
-    header {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    h1 {
-        font-size: 20px;
-        text-align: center;
-    }
-    
-    .search-bar {
-        grid-template-columns: 1fr;
-    }
-    
-    .recipes-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .modal {
-        padding: 0;
-    }
-    
-    .modal-content {
-        margin: 0;
-        padding: 25px;
-        border-radius: 0;
-        min-height: 100vh;
-    }
-    
     .ingredient-row {
-        grid-template-columns: 1fr;
-    }
-    
-    .form-buttons {
         grid-template-columns: 1fr;
     }
 }
@@ -329,71 +393,117 @@ form textarea:focus {
 <body>
     <div class="container">
         <header>
-            <h1>Технологические карты</h1>
-            <button id="addBtn" class="btn-primary">Добавить рецепт</button>
+            <h1>Рецепты</h1>
+            <p class="subtitle">Ваша кулинарная книга</p>
         </header>
 
+        <div class="tabs">
+            <button class="tab active" data-category="">Все</button>
+            <button class="tab" data-category="торты">Торты</button>
+            <button class="tab" data-category="кексы">Кексы</button>
+            <button class="tab" data-category="печенье">Печенье</button>
+            <button class="tab" data-category="вафли">Вафли</button>
+            <button class="tab" data-category="кейкпопс">Кейк попс</button>
+            <button class="tab" data-category="другое">Другое</button>
+        </div>
+
         <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Поиск по названию...">
-            <select id="categoryFilter">
-                <option value="">Все категории</option>
-                <option value="торты">Торты</option>
-                <option value="пирожные">Пирожные</option>
-                <option value="десерты">Десерты</option>
-                <option value="крема">Крема</option>
-                <option value="муссы">Муссы</option>
-                <option value="бисквиты">Бисквиты</option>
-                <option value="начинки">Начинки</option>
-                <option value="глазури">Глазури</option>
-                <option value="декор">Декор</option>
-                <option value="другое">Другое</option>
-            </select>
+            <span>🔍</span>
+            <input type="text" id="searchInput" placeholder="Поиск рецептов...">
         </div>
 
         <div id="recipesList" class="recipes-grid"></div>
+    </div>
 
-        <div id="modal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2 id="modalTitle">Новый рецепт</h2>
-                <form id="recipeForm">
-                    <input type="hidden" id="recipeId">
-                    
-                    <label>Название:</label>
-                    <input type="text" id="recipeName" required>
+    <button class="fab" id="addBtn">+</button>
 
-                    <label>Категория:</label>
-                    <select id="recipeCategory" required>
-                        <option value="торты">Торты</option>
-                        <option value="пирожные">Пирожные</option>
-                        <option value="десерты">Десерты</option>
-                        <option value="крема">Крема</option>
-                        <option value="муссы">Муссы</option>
-                        <option value="бисквиты">Бисквиты</option>
-                        <option value="начинки">Начинки</option>
-                        <option value="глазури">Глазури</option>
-                        <option value="декор">Декор</option>
-                        <option value="другое">Другое</option>
+    <div id="modal" class="modal">
+        <div class="modal-header">
+            <h2 id="modalTitle">Новый рецепт</h2>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-content">
+            <form id="recipeForm">
+                <input type="hidden" id="recipeId">
+                
+                <label>Название:</label>
+                <input type="text" id="recipeName" required placeholder="Например: Шоколадный торт">
+
+                <label>Категория:</label>
+                <select id="recipeCategory" required>
+                    <option value="торты">Торты</option>
+                    <option value="кексы">Кексы</option>
+                    <option value="печенье">Печенье</option>
+                    <option value="вафли">Вафли</option>
+                    <option value="кейкпопс">Кейк попс</option>
+                    <option value="другое">Другое</option>
+                </select>
+
+                <label>Фото:</label>
+                <input type="file" id="imageUpload" accept="image/*">
+                <div id="uploadStatus" style="margin-top: 10px; color: #ff9a3c; font-size: 13px;"></div>
+                <input type="hidden" id="recipeImage">
+
+                <label>Ингредиенты:</label>
+                <div id="ingredientsList"></div>
+                <button type="button" id="addIngredientBtn" class="btn-add-ingredient">+ Добавить ингредиент</button>
+
+                <label>Инструкция:</label>
+                <textarea id="recipeInstructions" rows="8" placeholder="Опишите процесс приготовления..."></textarea>
+
+                <label>Время приготовления (мин):</label>
+                <input type="number" id="recipeTime" placeholder="60">
+
+                <label>Размер формы (см):</label>
+                <select id="recipeFormSize">
+                    <option value="">Не указан</option>
+                    <option value="10">10 см (бенто)</option>
+                    <option value="12">12 см (бенто)</option>
+                    <option value="14">14 см (мини)</option>
+                    <option value="16">16 см</option>
+                    <option value="18">18 см</option>
+                    <option value="20">20 см</option>
+                    <option value="22">22 см</option>
+                    <option value="24">24 см</option>
+                    <option value="26">26 см</option>
+                    <option value="28">28 см (макси)</option>
+                    <option value="30">30 см (макси)</option>
+                </select>
+
+                <label>Количество (для пересчета):</label>
+                <input type="number" id="recipeQuantity" placeholder="Например: 20 шт">
+
+                <label>Выход (порций/шт):</label>
+                <input type="text" id="recipeYield" placeholder="8 порций">
+
+                <button type="submit" class="btn-primary">Сохранить рецепт</button>
+                <button type="button" id="cancelBtn" class="btn-secondary">Отмена</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="viewModal" class="modal">
+        <div class="modal-header">
+            <h2>Рецепт</h2>
+            <span class="close close-view">&times;</span>
+        </div>
+        <div class="modal-content">
+            <div id="recipeView"></div>
+            
+            <div id="calculator" style="display:none; margin-top: 30px; padding: 20px; background: #2a2a2a; border-radius: 12px;">
+                <h3 style="margin-bottom: 15px;">Пересчет рецепта</h3>
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px;">Тип пересчета:</label>
+                    <select id="recalcType" style="width: 100%; padding: 10px; border-radius: 8px;">
+                        <option value="diameter">По диаметру формы</option>
+                        <option value="quantity">По количеству (шт)</option>
                     </select>
-
-                    <label>Фото:</label>
-                    <input type="file" id="imageUpload" accept="image/*" style="padding: 10px;">
-                    <div id="uploadStatus" style="margin-top: 10px; color: #667eea; font-size: 13px;"></div>
-                    <input type="hidden" id="recipeImage">
-
-                    <label>Ингредиенты:</label>
-                    <div id="ingredientsList"></div>
-                    <button type="button" id="addIngredientBtn" class="btn-add-ingredient" style="margin-top: 10px;">+ Добавить ингредиент</button>
-
-                    <label>Инструкция:</label>
-                    <textarea id="recipeInstructions" rows="8"></textarea>
-
-                    <label>Время приготовления (мин):</label>
-                    <input type="number" id="recipeTime">
-
-                    <label>Размер формы (см):</label>
-                    <select id="recipeFormSize">
-                        <option value="">Не указан</option>
+                </div>
+                
+                <div id="diameterRecalc">
+                    <label style="display: block; margin-bottom: 5px;">Пересчитать на форму:</label>
+                    <select id="targetFormSize" style="width: 100%; padding: 10px; border-radius: 8px;">
                         <option value="10">10 см (бенто)</option>
                         <option value="12">12 см (бенто)</option>
                         <option value="14">14 см (мини)</option>
@@ -406,76 +516,22 @@ form textarea:focus {
                         <option value="28">28 см (макси)</option>
                         <option value="30">30 см (макси)</option>
                     </select>
-
-                    <label>Количество (для пересчета):</label>
-                    <input type="number" id="recipeQuantity" placeholder="Например: 20 шт">
-
-                    <label>Выход (порций/шт):</label>
-                    <input type="text" id="recipeYield">
-
-                    <div class="form-buttons">
-                        <button type="submit" class="btn-primary">Сохранить</button>
-                        <button type="button" id="cancelBtn" class="btn-secondary">Отмена</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div id="viewModal" class="modal">
-            <div class="modal-content">
-                <span class="close-view">&times;</span>
-                <div id="recipeView"></div>
-                
-                <div id="calculator" style="display:none; margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 12px;">
-                    <h3 style="margin-bottom: 15px;">Пересчет рецепта</h3>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px;">Тип пересчета:</label>
-                        <select id="recalcType" style="width: 100%; padding: 10px; border-radius: 8px;">
-                            <option value="diameter">По диаметру формы</option>
-                            <option value="quantity">По количеству (шт)</option>
-                        </select>
-                    </div>
-                    
-                    <div id="diameterRecalc">
-                        <label style="display: block; margin-bottom: 5px;">Пересчитать на форму:</label>
-                        <select id="targetFormSize" style="width: 100%; padding: 10px; border-radius: 8px;">
-                            <option value="10">10 см (бенто)</option>
-                            <option value="12">12 см (бенто)</option>
-                            <option value="14">14 см (мини)</option>
-                            <option value="16">16 см</option>
-                            <option value="18">18 см</option>
-                            <option value="20">20 см</option>
-                            <option value="22">22 см</option>
-                            <option value="24">24 см</option>
-                            <option value="26">26 см</option>
-                            <option value="28">28 см (макси)</option>
-                            <option value="30">30 см (макси)</option>
-                        </select>
-                    </div>
-                    
-                    <div id="quantityRecalc" style="display: none;">
-                        <label style="display: block; margin-bottom: 5px;">Новое количество (шт):</label>
-                        <input type="number" id="targetQuantity" style="width: 100%; padding: 10px; border-radius: 8px;" placeholder="Например: 30">
-                    </div>
-                    
-                    <button onclick="calculateRecipe()" class="btn-primary" style="width: 100%; margin-top: 15px;">Пересчитать</button>
-                    <div id="calculatedResult" style="margin-top: 15px;"></div>
                 </div>
+                
+                <div id="quantityRecalc" style="display: none;">
+                    <label style="display: block; margin-bottom: 5px;">Новое количество (шт):</label>
+                    <input type="number" id="targetQuantity" style="width: 100%; padding: 10px; border-radius: 8px;" placeholder="Например: 30">
+                </div>
+                
+                <button onclick="calculateRecipe()" class="btn-primary">Пересчитать</button>
+                <div id="calculatedResult" style="margin-top: 15px;"></div>
             </div>
         </div>
     </div>
 
-    <!-- Telegram Web App SDK - загружается асинхронно -->
+    <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js" async></script>
     
-    <script>
-// Проверка загрузки Telegram Web App
-window.addEventListener('load', function() {
-    console.log('Страница загружена');
-    console.log('Telegram WebApp доступен:', !!window.Telegram?.WebApp);
-});
-    </script>
     <script>
 // Список популярных продуктов
 const products = [
@@ -495,6 +551,7 @@ const units = ['гр', 'мл', 'шт', 'ст.л.', 'ч.л.', 'щепотка', '
 
 let recipes = JSON.parse(localStorage.getItem('recipes')) || [];
 let ingredients = [];
+let currentCategory = '';
 
 // Безопасная инициализация Telegram Web App
 const tg = (function() {
@@ -503,13 +560,11 @@ const tg = (function() {
         try {
             app.ready();
             app.expand();
-            console.log('Telegram Web App инициализирован');
-        } catch (e) {
-            console.log('Ошибка инициализации Telegram:', e);
-        }
+            app.setHeaderColor('#1a1a1a');
+            app.setBackgroundColor('#1a1a1a');
+        } catch (e) {}
         return app;
     }
-    console.log('Работаем в обычном браузере');
     return {
         ready: () => {},
         expand: () => {},
@@ -526,7 +581,6 @@ const cancelBtn = document.getElementById('cancelBtn');
 const recipeForm = document.getElementById('recipeForm');
 const recipesList = document.getElementById('recipesList');
 const searchInput = document.getElementById('searchInput');
-const categoryFilter = document.getElementById('categoryFilter');
 const imageUpload = document.getElementById('imageUpload');
 const addIngredientBtn = document.getElementById('addIngredientBtn');
 const recalcType = document.getElementById('recalcType');
@@ -545,6 +599,16 @@ const recalcTable = {
     28: { 10: 0.13, 12: 0.18, 14: 0.25, 16: 0.35, 18: 0.4, 20: 0.5, 22: 0.6, 24: 0.75, 26: 0.85, 28: 1, 30: 1.15 },
     30: { 10: 0.11, 12: 0.16, 14: 0.2, 16: 0.3, 18: 0.35, 20: 0.45, 22: 0.55, 24: 0.65, 26: 0.75, 28: 0.85, 30: 1 }
 };
+
+// Табы категорий
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.onclick = () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentCategory = tab.dataset.category;
+        displayRecipes();
+    };
+});
 
 recalcType.onchange = () => {
     if (recalcType.value === 'diameter') {
@@ -565,7 +629,7 @@ function renderIngredients() {
                     id="product-${index}"
                     oninput="updateIngredient(${index}, 'product', this.value); searchProduct(${index}, this.value)" 
                     onfocus="showDropdown(${index})"
-                    placeholder="Начните вводить продукт...">
+                    placeholder="Продукт...">
                 <div id="dropdown-${index}" class="product-dropdown"></div>
             </div>
             <input type="number" value="${ing.amount}" 
@@ -626,10 +690,8 @@ function removeIngredient(index) {
 addIngredientBtn.onclick = () => {
     ingredients.push({ product: '', amount: '', unit: 'гр' });
     renderIngredients();
-    console.log('Добавлен ингредиент, всего:', ingredients.length);
 };
 
-// Закрытие dropdown при клике вне
 document.addEventListener('click', (e) => {
     if (!e.target.closest('.product-search')) {
         document.querySelectorAll('.product-dropdown').forEach(d => d.style.display = 'none');
@@ -662,12 +724,12 @@ imageUpload.onchange = (e) => {
     
     if (file.size > 20 * 1024 * 1024) {
         statusDiv.textContent = '❌ Файл слишком большой (макс 20MB)';
-        statusDiv.style.color = '#e74c3c';
+        statusDiv.style.color = '#ff4444';
         return;
     }
     
     statusDiv.textContent = '⏳ Обработка фото...';
-    statusDiv.style.color = '#667eea';
+    statusDiv.style.color = '#ff9a3c';
     
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -681,16 +743,10 @@ imageUpload.onchange = (e) => {
 recipeForm.onsubmit = (e) => {
     e.preventDefault();
     
-    console.log('Форма отправлена');
-    console.log('Ингредиенты:', ingredients);
-    
-    // Фильтруем пустые ингредиенты
     const validIngredients = ingredients.filter(i => i.product && i.product.trim() && i.amount);
     
-    console.log('Валидные ингредиенты:', validIngredients);
-    
     if (validIngredients.length === 0) {
-        alert('Добавьте хотя бы один ингредиент с названием и количеством');
+        alert('Добавьте хотя бы один ингредиент');
         return;
     }
     
@@ -699,7 +755,7 @@ recipeForm.onsubmit = (e) => {
         id: id || Date.now().toString(),
         name: document.getElementById('recipeName').value,
         category: document.getElementById('recipeCategory').value,
-        image: document.getElementById('recipeImage').value || 'https://via.placeholder.com/400x300?text=Нет+фото',
+        image: document.getElementById('recipeImage').value || 'https://via.placeholder.com/180x180?text=Фото',
         ingredients: JSON.stringify(validIngredients),
         instructions: document.getElementById('recipeInstructions').value,
         time: document.getElementById('recipeTime').value,
@@ -708,8 +764,6 @@ recipeForm.onsubmit = (e) => {
         yield: document.getElementById('recipeYield').value,
         createdAt: id ? recipes.find(r => r.id === id).createdAt : new Date().toISOString()
     };
-
-    console.log('Сохраняем рецепт:', recipe);
 
     if (id) {
         const index = recipes.findIndex(r => r.id === id);
@@ -721,66 +775,48 @@ recipeForm.onsubmit = (e) => {
     saveRecipes();
     displayRecipes();
     modal.style.display = 'none';
-    alert('Рецепт сохранен!');
 };
 
 function saveRecipes() {
-    console.log('Сохраняем рецепты:', recipes.length);
     localStorage.setItem('recipes', JSON.stringify(recipes));
-    
-    // Синхронизация с Telegram Cloud Storage если доступно
     if (tg && tg.CloudStorage) {
         try {
-            tg.CloudStorage.setItem('recipes', JSON.stringify(recipes), function(error) {
-                if (error) {
-                    console.log('Ошибка сохранения в Telegram Cloud:', error);
-                } else {
-                    console.log('Сохранено в Telegram Cloud');
-                }
-            });
-        } catch (e) {
-            console.log('Ошибка при работе с Telegram Cloud:', e);
-        }
+            tg.CloudStorage.setItem('recipes', JSON.stringify(recipes));
+        } catch (e) {}
     }
 }
 
-// Загрузка рецептов при старте
 if (tg && tg.CloudStorage) {
     try {
         tg.CloudStorage.getItem('recipes', function(error, value) {
             if (!error && value) {
                 recipes = JSON.parse(value);
-                console.log('Загружено из Telegram Cloud:', recipes.length);
                 displayRecipes();
             } else {
-                console.log('Загружаем из localStorage');
                 displayRecipes();
             }
         });
     } catch (e) {
-        console.log('Ошибка загрузки из Telegram Cloud:', e);
         displayRecipes();
     }
 } else {
-    console.log('Загружаем из localStorage');
     displayRecipes();
 }
 
 function displayRecipes() {
-    const category = categoryFilter.value;
     const search = searchInput.value.toLowerCase();
     
     const filtered = recipes.filter(recipe => {
-        const matchesCategory = !category || recipe.category === category;
+        const matchesCategory = !currentCategory || recipe.category === currentCategory;
         const matchesSearch = recipe.name.toLowerCase().includes(search);
         return matchesCategory && matchesSearch;
     });
 
     if (filtered.length === 0) {
         recipesList.innerHTML = `
-            <div class="empty-state" style="text-align: center; padding: 80px 30px; background: white; border-radius: 20px;">
+            <div class="empty-state">
                 <h2>Пока нет рецептов</h2>
-                <p style="color: #999;">Добавьте свой первый рецепт</p>
+                <p>Добавьте свой первый рецепт</p>
             </div>
         `;
         return;
@@ -788,14 +824,15 @@ function displayRecipes() {
 
     recipesList.innerHTML = filtered.map(recipe => `
         <div class="recipe-card" onclick="viewRecipe('${recipe.id}')">
-            <img src="${recipe.image}" alt="${recipe.name}" onerror="this.src='https://via.placeholder.com/400x300?text=Нет+фото'">
+            <div class="recipe-image-container">
+                <img src="${recipe.image}" alt="${recipe.name}" onerror="this.src='https://via.placeholder.com/180x180?text=Фото'">
+            </div>
             <div class="recipe-card-content">
-                <span class="recipe-category">${recipe.category}</span>
                 <h3>${recipe.name}</h3>
                 <div class="recipe-meta">
-                    ${recipe.time ? `Время: ${recipe.time} мин` : ''}
-                    ${recipe.formSize ? ` | Форма: ${recipe.formSize} см` : ''}
-                    ${recipe.quantity ? ` | Кол-во: ${recipe.quantity} шт` : ''}
+                    ${recipe.time ? `⏱ ${recipe.time} мин` : ''}
+                    ${recipe.formSize ? ` • ${recipe.formSize} см` : ''}
+                    ${recipe.quantity ? ` • ${recipe.quantity} шт` : ''}
                 </div>
                 <div class="recipe-actions" onclick="event.stopPropagation()">
                     <button class="btn-edit" onclick="editRecipe('${recipe.id}')">Изменить</button>
@@ -816,22 +853,25 @@ function viewRecipe(id) {
     const ings = JSON.parse(recipe.ingredients);
 
     const ingredientsList = ings.map(i => 
-        `<li>${i.product} - ${i.amount} ${i.unit}</li>`
+        `<div style="padding: 10px; background: #2a2a2a; border-radius: 8px; margin-bottom: 8px;">
+            ${i.product} - ${i.amount} ${i.unit}
+        </div>`
     ).join('');
 
     document.getElementById('recipeView').innerHTML = `
-        <img src="${recipe.image}" alt="${recipe.name}" onerror="this.src='https://via.placeholder.com/400x300?text=Нет+фото'" style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 20px; margin-bottom: 25px;">
-        <h2 style="font-size: 24px; margin-bottom: 15px;">${recipe.name}</h2>
-        <span class="recipe-category">${recipe.category}</span>
-        <div class="recipe-meta" style="margin-top: 15px;">
-            ${recipe.time ? `Время: ${recipe.time} мин` : ''}
-            ${recipe.formSize ? ` | Форма: ${recipe.formSize} см` : ''}
-            ${recipe.quantity ? ` | Кол-во: ${recipe.quantity} шт` : ''}
+        <div style="text-align: center; margin-bottom: 30px;">
+            <img src="${recipe.image}" alt="${recipe.name}" onerror="this.src='https://via.placeholder.com/180x180?text=Фото'" style="width: 180px; height: 180px; object-fit: cover; border-radius: 50%;">
+        </div>
+        <h2 style="font-size: 28px; margin-bottom: 15px; text-align: center;">${recipe.name}</h2>
+        <div style="text-align: center; color: #999; margin-bottom: 30px;">
+            ${recipe.time ? `⏱ ${recipe.time} мин` : ''}
+            ${recipe.formSize ? ` • ${recipe.formSize} см` : ''}
+            ${recipe.quantity ? ` • ${recipe.quantity} шт` : ''}
         </div>
         <h3 style="margin-top: 25px; margin-bottom: 15px; font-size: 18px;">Ингредиенты:</h3>
-        <ul style="line-height: 1.8;">${ingredientsList}</ul>
+        ${ingredientsList}
         <h3 style="margin-top: 25px; margin-bottom: 15px; font-size: 18px;">Инструкция:</h3>
-        <p style="white-space: pre-wrap; line-height: 1.8;">${recipe.instructions}</p>
+        <p style="white-space: pre-wrap; line-height: 1.8; color: #ccc;">${recipe.instructions || 'Не указана'}</p>
     `;
     
     const calculator = document.getElementById('calculator');
@@ -874,7 +914,9 @@ function calculateRecipe() {
     const ings = JSON.parse(currentRecipe.ingredients);
     const recalculated = ings.map(i => {
         const newAmount = (parseFloat(i.amount) * coefficient).toFixed(1);
-        return `<li>${i.product} - ${newAmount} ${i.unit}</li>`;
+        return `<div style="padding: 10px; background: #2a2a2a; border-radius: 8px; margin-bottom: 8px;">
+            ${i.product} - ${newAmount} ${i.unit}
+        </div>`;
     }).join('');
     
     let title = '';
@@ -885,9 +927,9 @@ function calculateRecipe() {
     }
     
     document.getElementById('calculatedResult').innerHTML = `
-        <div style="background: white; padding: 15px; border-radius: 8px; margin-top: 10px;">
-            <h4 style="color: #4CAF50; margin-bottom: 10px;">${title}</h4>
-            <ul style="list-style-position: inside;">${recalculated}</ul>
+        <div style="background: #1a1a1a; padding: 15px; border-radius: 8px; margin-top: 10px; border: 1px solid #ff9a3c;">
+            <h4 style="color: #ff9a3c; margin-bottom: 10px;">${title}</h4>
+            ${recalculated}
         </div>
     `;
 }
@@ -896,7 +938,7 @@ function editRecipe(id) {
     const recipe = recipes.find(r => r.id === id);
     if (!recipe) return;
 
-    document.getElementById('modalTitle').textContent = 'Редактировать рецепт';
+    document.getElementById('modalTitle').textContent = 'Редактировать';
     document.getElementById('recipeId').value = recipe.id;
     document.getElementById('recipeName').value = recipe.name;
     document.getElementById('recipeCategory').value = recipe.category;
@@ -922,7 +964,6 @@ function deleteRecipe(id) {
 }
 
 searchInput.oninput = displayRecipes;
-categoryFilter.onchange = displayRecipes;
 
 displayRecipes();
     </script>
