@@ -125,16 +125,14 @@ h1 {
     width: 100%;
     height: 200px;
     background: #1a1a1a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: hidden;
 }
 
 .recipe-image-container img {
-    width: 180px;
-    height: 180px;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    border-radius: 50%;
+    border-radius: 0;
 }
 
 .recipe-card-content {
@@ -280,10 +278,10 @@ form textarea {
 
 .ingredient-row {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr auto;
+    grid-template-columns: 2fr 1fr 1fr;
     gap: 10px;
     margin-bottom: 10px;
-    align-items: center;
+    align-items: start;
 }
 
 .ingredient-row input,
@@ -292,13 +290,15 @@ form textarea {
     padding: 10px;
 }
 
-.ingredient-row button {
-    padding: 10px;
+.btn-remove-ingredient {
+    padding: 10px 16px;
     background: #ff4444;
     color: white;
     border: none;
     border-radius: 8px;
     cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .product-search {
@@ -440,7 +440,8 @@ form textarea {
                 </select>
 
                 <label>Фото:</label>
-                <input type="file" id="imageUpload" accept="image/*">
+                <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                <button type="button" onclick="document.getElementById('imageUpload').click()" class="btn-add-ingredient" style="width: 100%; margin-top: 0;">+ Добавить фото</button>
                 <div id="uploadStatus" style="margin-top: 10px; color: #ff9a3c; font-size: 13px;"></div>
                 <input type="hidden" id="recipeImage">
 
@@ -623,23 +624,25 @@ recalcType.onchange = () => {
 function renderIngredients() {
     const container = document.getElementById('ingredientsList');
     container.innerHTML = ingredients.map((ing, index) => `
-        <div class="ingredient-row">
-            <div class="product-search">
-                <input type="text" value="${ing.product}" 
-                    id="product-${index}"
-                    oninput="updateIngredient(${index}, 'product', this.value); searchProduct(${index}, this.value)" 
-                    onfocus="showDropdown(${index})"
-                    placeholder="Продукт...">
-                <div id="dropdown-${index}" class="product-dropdown"></div>
+        <div style="margin-bottom: 20px; padding: 15px; background: #2a2a2a; border-radius: 12px;">
+            <div class="ingredient-row">
+                <div class="product-search">
+                    <input type="text" value="${ing.product}" 
+                        id="product-${index}"
+                        oninput="updateIngredient(${index}, 'product', this.value); searchProduct(${index}, this.value)" 
+                        onfocus="showDropdown(${index})"
+                        placeholder="Продукт...">
+                    <div id="dropdown-${index}" class="product-dropdown"></div>
+                </div>
+                <input type="number" value="${ing.amount}" 
+                    id="amount-${index}"
+                    oninput="updateIngredient(${index}, 'amount', this.value)" 
+                    placeholder="Кол-во" step="0.1">
+                <select id="unit-${index}" onchange="updateIngredient(${index}, 'unit', this.value)">
+                    ${units.map(u => `<option value="${u}" ${ing.unit === u ? 'selected' : ''}>${u}</option>`).join('')}
+                </select>
             </div>
-            <input type="number" value="${ing.amount}" 
-                id="amount-${index}"
-                oninput="updateIngredient(${index}, 'amount', this.value)" 
-                placeholder="Кол-во" step="0.1">
-            <select id="unit-${index}" onchange="updateIngredient(${index}, 'unit', this.value)">
-                ${units.map(u => `<option value="${u}" ${ing.unit === u ? 'selected' : ''}>${u}</option>`).join('')}
-            </select>
-            <button type="button" onclick="removeIngredient(${index})">×</button>
+            <button type="button" class="btn-remove-ingredient" onclick="removeIngredient(${index})" style="width: 100%; margin-top: 10px;">Удалить</button>
         </div>
     `).join('');
 }
@@ -683,8 +686,10 @@ function updateIngredient(index, field, value) {
 }
 
 function removeIngredient(index) {
-    ingredients.splice(index, 1);
-    renderIngredients();
+    if (confirm('Удалить этот ингредиент?')) {
+        ingredients.splice(index, 1);
+        renderIngredients();
+    }
 }
 
 addIngredientBtn.onclick = () => {
